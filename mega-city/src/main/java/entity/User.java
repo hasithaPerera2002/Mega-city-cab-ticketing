@@ -13,7 +13,7 @@ public class User {
     private String nic;
     private String front_image;
     private String back_image;
-    private String status;
+
     public User() {
     }
     public User(Long user_id, String username, String password_hash, String email, String phone_number, String address, String role, String nic, String front_image, String back_image, String status) {
@@ -27,7 +27,6 @@ public class User {
         this.nic = nic;
         this.front_image = front_image;
         this.back_image = back_image;
-        this.status = status;
     }
     public String getBack_image() {
         return back_image;
@@ -109,15 +108,6 @@ public class User {
         this.front_image = front_image;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-
     @Override
     public String toString() {
         return "User{" +
@@ -131,7 +121,6 @@ public class User {
                 ", nic='" + nic + '\'' +
                 ", front_image='" + front_image + '\'' +
                 ", back_image='" + back_image + '\'' +
-                ", status='" + status + '\'' +
                 '}';
     }
 }

@@ -11,11 +11,15 @@ public class Trip {
     private String end_longitude;
     private String end_latitude;
     private int fare;
+    private String destination;
+    private String distance;
+    private String startTime;
+    private String endTime;
 
     public Trip() {
     }
 
-    public Trip(Long trip_id, String customer_id, String vehicle_id, String date, String start_longitude, String start_latitude, String end_longitude, String end_latitude, int fare) {
+    public Trip(Long trip_id, String customer_id, String vehicle_id, String date, String start_longitude, String start_latitude, String end_longitude, String end_latitude, int fare, String destination, String distance, String startTime, String endTime) {
         this.trip_id = trip_id;
         this.customer_id = customer_id;
         this.vehicle_id = vehicle_id;
@@ -25,6 +29,10 @@ public class Trip {
         this.end_longitude = end_longitude;
         this.end_latitude = end_latitude;
         this.fare = fare;
+        this.destination = destination;
+        this.distance = distance;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     public Long getTrip_id() {
@@ -99,6 +107,40 @@ public class Trip {
         this.fare = fare;
     }
 
+    public String getDestination() {
+        return destination;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+
+
     @Override
     public String toString() {
         return "Trip{" +
@@ -110,7 +152,11 @@ public class Trip {
                 ", start_latitude='" + start_latitude + '\'' +
                 ", end_longitude='" + end_longitude + '\'' +
                 ", end_latitude='" + end_latitude + '\'' +
-                ", fare=" + fare +
+                ", fare=" + fare + '\'' +
+                ", destination='" + destination + '\'' +
+                ", distance='" + distance + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\n' +
                 '}';
     }
 }
