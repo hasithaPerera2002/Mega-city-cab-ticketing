@@ -1,15 +1,17 @@
 package entity;
 
+import java.util.UUID;
+
 public class Vehicle {
 
-    private Long vehicle_id;
+    private UUID vehicle_id;
     private String vehicle_number;
     private String vehicle_type;
     private String vehicle_color;
     private String vehicle_modal;
     private String vehicle_image;
     private String status;
-    private String driver_id;
+    private UUID driver_id;
     private String driver_name;
     private String driver_contact;
     private String driver_nic;
@@ -18,7 +20,7 @@ public class Vehicle {
     public Vehicle() {
     }
 
-    public Vehicle(Long vehicle_id, String vehicle_number, String vehicle_type, String vehicle_color, String vehicle_modal, String vehicle_image, String status, String driver_id, String driver_name, String driver_contact, String driver_nic, String driver_email) {
+    public Vehicle(UUID vehicle_id, String vehicle_number, String vehicle_type, String vehicle_color, String vehicle_modal, String vehicle_image, String status, UUID driver_id, String driver_name, String driver_contact, String driver_nic, String driver_email) {
         this.vehicle_id = vehicle_id;
         this.vehicle_number = vehicle_number;
         this.vehicle_type = vehicle_type;
@@ -33,11 +35,11 @@ public class Vehicle {
         this.driver_email = driver_email;
     }
 
-    public Long getVehicle_id() {
+    public UUID getVehicle_id() {
         return vehicle_id;
     }
 
-    public void setVehicle_id(Long vehicle_id) {
+    public void setVehicle_id(UUID vehicle_id) {
         this.vehicle_id = vehicle_id;
     }
 
@@ -89,11 +91,11 @@ public class Vehicle {
         this.status = status;
     }
 
-    public String getDriver_id() {
+    public UUID getDriver_id() {
         return driver_id;
     }
 
-    public void setDriver_id(String driver_id) {
+    public void setDriver_id(UUID driver_id) {
         this.driver_id = driver_id;
     }
 
