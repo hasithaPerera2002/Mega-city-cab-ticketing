@@ -3,7 +3,7 @@ package entity;
 import java.util.UUID;
 
 public class User {
-    private Long user_id;
+    private UUID user_id;
     private String username;
     private String password_hash;
     private String email;
@@ -16,7 +16,7 @@ public class User {
 
     public User() {
     }
-    public User(Long user_id, String username, String password_hash, String email, String phone_number, String address, String role, String nic, String front_image, String back_image, String status) {
+    public User(UUID user_id, String username, String password_hash, String email, String phone_number, String address, String role, String nic, String front_image, String back_image, String status) {
         this.user_id = user_id;
         this.username = username;
         this.password_hash = password_hash;
@@ -36,11 +36,11 @@ public class User {
         this.back_image = back_image;
     }
 
-    public Long getUser_id() {
+    public UUID getUser_id() {
         return user_id;
     }
 
-    public void setUser_id(Long user_id) {
+    public void setUser_id(UUID user_id) {
         this.user_id = user_id;
     }
 
