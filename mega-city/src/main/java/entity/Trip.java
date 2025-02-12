@@ -1,8 +1,10 @@
 package entity;
 
+import java.util.UUID;
+
 public class Trip {
 
-    private Long trip_id;
+    private UUID trip_id;
     private String customer_id;
     private String vehicle_id;
     private String date;
@@ -19,7 +21,7 @@ public class Trip {
     public Trip() {
     }
 
-    public Trip(Long trip_id, String customer_id, String vehicle_id, String date, String start_longitude, String start_latitude, String end_longitude, String end_latitude, int fare, String destination, String distance, String startTime, String endTime) {
+    public Trip(UUID trip_id, String customer_id, String vehicle_id, String date, String start_longitude, String start_latitude, String end_longitude, String end_latitude, int fare, String destination, String distance, String startTime, String endTime) {
         this.trip_id = trip_id;
         this.customer_id = customer_id;
         this.vehicle_id = vehicle_id;
@@ -35,11 +37,11 @@ public class Trip {
         this.endTime = endTime;
     }
 
-    public Long getTrip_id() {
+    public UUID getTrip_id() {
         return trip_id;
     }
 
-    public void setTrip_id(Long trip_id) {
+    public void setTrip_id(UUID trip_id) {
         this.trip_id = trip_id;
     }
 
