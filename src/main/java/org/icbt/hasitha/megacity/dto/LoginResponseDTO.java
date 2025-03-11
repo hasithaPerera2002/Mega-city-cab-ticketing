@@ -77,6 +77,7 @@ public class LoginResponseDTO {
                 ", message='" + message + '\'' +
                 ", error='" + error + '\'' +
                 ", role=" + role +
+                ", username='" + username + '\'' +
                 '}';
     }
 }
