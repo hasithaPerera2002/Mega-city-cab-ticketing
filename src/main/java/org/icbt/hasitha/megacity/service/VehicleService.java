@@ -5,6 +5,7 @@ import org.icbt.hasitha.megacity.dto.ResultDTO;
 import org.icbt.hasitha.megacity.dto.VehicleDTO;
 import org.icbt.hasitha.megacity.entity.Vehicle;
 import org.icbt.hasitha.megacity.repository.VehicleRepo;
+import org.icbt.hasitha.megacity.service.interfaces.IVehicleService;
 import org.icbt.hasitha.megacity.util.enums.VehicleStatus;
 import org.icbt.hasitha.megacity.util.enums.VehicleTypes;
 import org.slf4j.Logger;
@@ -15,10 +16,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class VehicleService {
+public class VehicleService implements IVehicleService {
     private final VehicleRepo vehicleRepository = new VehicleRepo();
     private final Logger LOGGER = LoggerFactory.getLogger(VehicleService.class);
 
+    @Override
     public ResultDTO<Boolean> addVehicle(VehicleDTO vehicle) {
 
         try {
@@ -30,6 +32,7 @@ public class VehicleService {
         }
     }
 
+    @Override
     public VehicleDTO[] getVehicles() {
         try {
             LOGGER.info("Getting vehicles...");
@@ -56,6 +59,7 @@ public class VehicleService {
         return new VehicleDTO[0];
     }
 
+    @Override
     public ResultDTO<Boolean> updateVehicle(VehicleDTO vehicleDTO) {
         LOGGER.info("Updating vehicle: {}", vehicleDTO);
         try {
@@ -71,6 +75,7 @@ public class VehicleService {
         }
     }
 
+    @Override
     public ResultDTO<Boolean> deleteVehicle(UUID vehicleId) {
         LOGGER.info("Deleting vehicle with ID: {}", vehicleId);
         try {

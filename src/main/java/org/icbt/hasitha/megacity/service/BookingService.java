@@ -5,6 +5,7 @@ import org.icbt.hasitha.megacity.dto.ResultDTO;
 import org.icbt.hasitha.megacity.dto.TripDetailsDTO;
 import org.icbt.hasitha.megacity.entity.Trip;
 import org.icbt.hasitha.megacity.repository.BookingRepo;
+import org.icbt.hasitha.megacity.service.interfaces.IBookingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,27 +13,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class BookingService {
+public class BookingService implements IBookingService {
     private final Logger LOGGER = LoggerFactory.getLogger(BookingService.class);
-    private BookingRepo bookingRepo;
-
-    public BookingService() {
-        this.bookingRepo = new BookingRepo();
-    }
-
-    public ResultDTO<Boolean> saveBooking(TripDetailsDTO tripDetailsDTO) {
-        LOGGER.info("BookingService.saveBooking: {}", tripDetailsDTO);
-        try {
-            boolean flag = bookingRepo.saveBooking(tripDetailsDTO);
-            return new ResultDTO<Boolean>("Booking saved successfully", HttpServletResponse.SC_CREATED, flag);
-        } catch (Exception e) {
-            LOGGER.error("Error saving booking: {}", e.getMessage());
-            return new ResultDTO<Boolean>(e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, false);
-        }
+    private BookingRepo bookingRepo =new BookingRepo();
 
 
-    }
-
+    @Override
     public List<TripDetailsDTO> getAllBookings(String userId) {
         LOGGER.info("Fetching all bookings for user: {}", userId != null ? userId : "ALL");
         try {
@@ -55,7 +41,7 @@ public class BookingService {
             return Collections.emptyList();
         }
     }
-
+    @Override
     public ResultDTO<Boolean> updateBooking(TripDetailsDTO tripDetailsDTO) {
         LOGGER.info("Updating booking: {}", tripDetailsDTO);
         try {
@@ -70,8 +56,7 @@ public class BookingService {
             return new ResultDTO<>(e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, false);
         }
     }
-
-    // Delete a booking by UUID
+    @Override
     public ResultDTO<Boolean> deleteBooking(UUID bookingId) {
         LOGGER.info("Deleting booking with ID: {}", bookingId);
         try {
@@ -86,4 +71,32 @@ public class BookingService {
             return new ResultDTO<>(e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, false);
         }
     }
+
+
+    @Override
+    public ResultDTO<Boolean> save(TripDetailsDTO tripDetailsDTO) {
+        LOGGER.info("BookingService.saveBooking: {}", tripDetailsDTO);
+        try {
+            boolean flag = bookingRepo.saveBooking(tripDetailsDTO);
+            if (flag) {
+                String subject = "Booking Confirmation";
+                String message = "Dear Customer,\n\nYour booking has been successfully placed!\n" +
+                        "Trip ID: " + tripDetailsDTO.getTripId() + "\n" +
+                        "Vehicle Type: " + tripDetailsDTO.getVehicleType() + "\n" +
+                        "Destination: " + tripDetailsDTO.getDestination() + "\n" +
+                        "Start Time: " + tripDetailsDTO.getStartTime() + "\n\n" +
+                        "Thank you for choosing our service.";
+
+                EmailService.sendBookingConfirmation(tripDetailsDTO.getCustomerEmail(), subject, message);
+            }
+            return new ResultDTO<Boolean>("Booking saved successfully", HttpServletResponse.SC_CREATED, flag);
+        } catch (Exception e) {
+            LOGGER.error("Error saving booking: {}", e.getMessage());
+            return new ResultDTO<Boolean>(e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, false);
+        }
+
+
+    }
+
+
 }
