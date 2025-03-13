@@ -4,16 +4,16 @@ public class ResultDTO<T> {
 
 
     private String message;
-    private String code;
+    private int code;
     private  T data;
 
-    public ResultDTO(String message, String code, T data) {
+    public ResultDTO(String message, int code, T data) {
         this.message = message;
         this.code = code;
         this.data = data;
     }
 
-    public ResultDTO(String message, String code) {
+    public ResultDTO(String message, int code) {
         this.message = message;
         this.code = code;
     }
@@ -30,11 +30,11 @@ public class ResultDTO<T> {
         this.message = message;
     }
 
-    public String getCode() {
+    public int getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(int code) {
         this.code = code;
     }
 
