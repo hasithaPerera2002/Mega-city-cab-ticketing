@@ -1,5 +1,6 @@
 package org.icbt.hasitha.megacity.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +32,8 @@ public class VehicleController extends HttpServlet {
         BufferedReader reader = req.getReader();
         VehicleDTO vehicleDTO = gson.fromJson(reader, VehicleDTO.class);
         LOGGER.info("Vehicle" + vehicleDTO);
-        String token = req.getHeader("Authorization");
+        String jwtToken = req.getHeader("Authorization");
+        String token = jwtToken.substring(7);
         LOGGER.info("token: {}",token);
         if (token == null || token.trim().isEmpty()) {
             this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Authorization token is required");
@@ -38,11 +41,17 @@ public class VehicleController extends HttpServlet {
         }
 
         token = token.trim();
-        boolean isValid = JwtUtil.isTokenValidAndNotExpired(token);
+        boolean isValid = JwtUtil.isTokenExpired(token);
 
-        if (!isValid) {
+        if (isValid) {
             this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Invalid token");
         }
+        if (!JwtUtil.isAdmin(token)) {
+            LOGGER.info("Invalid token");
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Admin access required");
+            return;
+        }
+
        ValidationResultDTO validationResultDTO = validateVehicle(vehicleDTO);
         if (validationResultDTO.isValid()) {
             this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "error", "Invalid vehicle data", validationResultDTO.getError());
@@ -59,6 +68,113 @@ public class VehicleController extends HttpServlet {
 
     }
 
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        LOGGER.info("Vehicle request received");
+        BufferedReader reader = req.getReader();
+        String jwtToken = req.getHeader("Authorization");
+        String token = jwtToken.substring(7);
+        LOGGER.info("token:{}",token);
+        if (token == null || token.trim().isEmpty()) {
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Authorization token is required");
+            return;
+        }
+        LOGGER.info("token: {}",token);
+        token = token.trim();
+        boolean isValid = JwtUtil.isTokenExpired(token);
+        LOGGER.info("token:{}",isValid);
+        if (isValid) {
+            LOGGER.info("Invalid token");
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Invalid token");
+        }
+
+        try {
+            VehicleDTO[] vehicleDTOS= vehicleService.getVehicles();
+            String jsonResponse = new ObjectMapper().writeValueAsString(vehicleDTOS);
+            LOGGER.info("Generated JSON Response: {}", jsonResponse);
+
+            this.sendResponse.SendJsonResponseData(resp, HttpServletResponse.SC_OK, "success", "Vehicle data retrieved successfully","", jsonResponse);
+        } catch (IOException e) {
+            this.sendResponse.SendJsonResponse( resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "error", "Failed to retrieve vehicle data", e.getMessage());
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        LOGGER.info("Vehicle update request received");
+        BufferedReader reader = req.getReader();
+        VehicleDTO vehicleDTO = gson.fromJson(reader, VehicleDTO.class);
+        LOGGER.info("Vehicle update details: " + vehicleDTO);
+
+        String jwtToken = req.getHeader("Authorization");
+        if (jwtToken == null || jwtToken.trim().isEmpty()) {
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Authorization token is required");
+            return;
+        }
+
+        String token = jwtToken.substring(7).trim();
+        if (JwtUtil.isTokenExpired(token)) {
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Invalid token");
+            return;
+        }
+
+        if (!JwtUtil.isAdmin(token)) {
+            LOGGER.info("Unauthorized update attempt");
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Admin access required");
+            return;
+        }
+
+        ValidationResultDTO validationResultDTO = validateVehicle(vehicleDTO);
+        if (!validationResultDTO.isValid()) {
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "error", "Invalid vehicle data", validationResultDTO.getError());
+            return;
+        }
+
+        ResultDTO<Boolean> resultDTO = vehicleService.updateVehicle(vehicleDTO);
+        if (resultDTO.getData()) {
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_OK, "success", "Vehicle updated successfully", null);
+        } else {
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "error", "Failed to update vehicle", resultDTO.getMessage());
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        LOGGER.info("Vehicle delete request received");
+
+        String jwtToken = req.getHeader("Authorization");
+        if (jwtToken == null || jwtToken.trim().isEmpty()) {
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Authorization token is required");
+            return;
+        }
+
+        String token = jwtToken.substring(7).trim();
+        if (JwtUtil.isTokenExpired(token)) {
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Invalid token");
+            return;
+        }
+
+        if (!JwtUtil.isAdmin(token)) {
+            LOGGER.info("Unauthorized delete attempt");
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Admin access required");
+            return;
+        }
+
+        String vehicleId = req.getParameter("vehicleId");
+        if (vehicleId == null || vehicleId.trim().isEmpty()) {
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "error", "Invalid request", "Vehicle ID is required");
+            return;
+        }
+
+        ResultDTO<Boolean> resultDTO = vehicleService.deleteVehicle(UUID.fromString(vehicleId));
+        if (resultDTO.getData()) {
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_OK, "success", "Vehicle deleted successfully", null);
+        } else {
+            this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "error", "Failed to delete vehicle", resultDTO.getMessage());
+        }
+    }
+
+
     public ValidationResultDTO validateVehicle(VehicleDTO vehicleDTO) {
         if (vehicleDTO.getVehicle_id() == null) {
             return new ValidationResultDTO(false, "Vehicle ID is required", "Missing vehicle ID");
@@ -70,18 +186,6 @@ public class VehicleController extends HttpServlet {
 
         if (vehicleDTO.getVehicle_type() == null) {
             return new ValidationResultDTO(false, "Vehicle type is required", "Missing vehicle type");
-        }
-
-        if (vehicleDTO.getVehicle_model() == null || vehicleDTO.getVehicle_model().isEmpty()) {
-            return new ValidationResultDTO(false, "Vehicle model is required", "Missing vehicle model");
-        }
-
-        if (vehicleDTO.getVehicle_color() == null || vehicleDTO.getVehicle_color().isEmpty()) {
-            return new ValidationResultDTO(false, "Vehicle color is required", "Missing vehicle color");
-        }
-
-        if (vehicleDTO.getVehicle_image() != null && !isValidImageFormat(vehicleDTO.getVehicle_image())) {
-            return new ValidationResultDTO(false, "Invalid vehicle image format", "Invalid image format");
         }
 
         if (vehicleDTO.getStatus() == null) {
@@ -109,10 +213,6 @@ public class VehicleController extends HttpServlet {
         }
 
         return new ValidationResultDTO(true, "Vehicle is valid", "No errors");
-    }
-
-    private boolean isValidImageFormat(String image) {
-        return image.matches("^(http(s)?://)?[\\w]+(\\.[\\w]+)+.*$") || image.matches("^[A-Za-z0-9+/=]+$");
     }
 
     private boolean isValidPhoneNumber(String phone) {
