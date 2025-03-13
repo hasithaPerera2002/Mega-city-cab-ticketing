@@ -15,14 +15,11 @@ import java.util.UUID;
 
 public class BookingRepo {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(BookingRepo.class);
-    private UserRepo userRepo;
-    private VehicleRepo vehicleRepo;
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookingRepo.class);
+    private final UserRepo userRepo = new UserRepo();
+    private final VehicleRepo vehicleRepo = new VehicleRepo();
 
-    public BookingRepo() {
-        this.userRepo = new UserRepo();
-        this.vehicleRepo = new VehicleRepo();
-    }
+
 
     public boolean saveBooking(TripDetailsDTO trip) {
         LOGGER.info("Booking save start");

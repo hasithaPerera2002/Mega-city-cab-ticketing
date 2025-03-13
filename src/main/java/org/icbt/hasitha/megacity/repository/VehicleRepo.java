@@ -2,6 +2,7 @@ package org.icbt.hasitha.megacity.repository;
 
 import org.icbt.hasitha.megacity.dto.VehicleDTO;
 import org.icbt.hasitha.megacity.entity.Vehicle;
+import org.icbt.hasitha.megacity.repository.interfaces.IVehicleRepo;
 import org.icbt.hasitha.megacity.util.db.DBConnection;
 import org.icbt.hasitha.megacity.util.enums.VehicleStatus;
 import org.icbt.hasitha.megacity.util.enums.VehicleTypes;
@@ -14,8 +15,10 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class VehicleRepo {
+public class VehicleRepo implements IVehicleRepo {
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(VehicleRepo.class);
+
+    @Override
     public boolean addVehicle(VehicleDTO vehicleDTO) {
         LOGGER.info("Adding new vehicle...");
 
@@ -45,6 +48,7 @@ public class VehicleRepo {
 
     }
 
+    @Override
     public boolean updateVehicle(VehicleDTO vehicleDTO) {
         LOGGER.info("Updating vehicle with ID: {}", vehicleDTO.getVehicle_id());
 
@@ -73,6 +77,7 @@ public class VehicleRepo {
         }
     }
 
+    @Override
     public boolean deleteVehicle(UUID vehicleId) {
         LOGGER.info("Deleting vehicle with ID: {}", vehicleId);
 
@@ -93,17 +98,17 @@ public class VehicleRepo {
         }
     }
 
-
+    @Override
     public Vehicle[] getVehicles() {
         String query = "SELECT * FROM vehicles";
-        try(Connection connection = DBConnection.getInstance().getConnection()){
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             LOGGER.info("Connected to database");
-            try(PreparedStatement statement = connection.prepareStatement(query)){
-                try(ResultSet resultSet = statement.executeQuery()){
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                try (ResultSet resultSet = statement.executeQuery()) {
                     LOGGER.info("Query executed");
                     Vehicle[] vehicles = new Vehicle[resultSet.getMetaData().getColumnCount()];
                     LOGGER.info("Number of rows affected: " + resultSet.getMetaData().getColumnCount());
-                    while(resultSet.next()){
+                    while (resultSet.next()) {
                         Vehicle vehicle = new Vehicle();
 
 
@@ -122,7 +127,7 @@ public class VehicleRepo {
                         LOGGER.info("Adding vehicle: {}", vehicle);
                         vehicle.setDriver_email(resultSet.getString("driver_email"));
                         LOGGER.info("Adding vehicle: {}", vehicle);
-                        vehicles[resultSet.getRow()-1] = vehicle;
+                        vehicles[resultSet.getRow() - 1] = vehicle;
                     }
                     LOGGER.info(Arrays.toString(vehicles));
                     return vehicles;
@@ -134,6 +139,7 @@ public class VehicleRepo {
         }
     }
 
+    @Override
     public UUID getVehicleIdByType(VehicleTypes vehicleType) {
         String query = "SELECT vehicle_id FROM vehicles WHERE vehicle_type = ? AND status = 'AVAILABLE' LIMIT 1";
 
@@ -152,7 +158,6 @@ public class VehicleRepo {
         }
         return null; // Return null if no available vehicle is found
     }
-
 
 
 }

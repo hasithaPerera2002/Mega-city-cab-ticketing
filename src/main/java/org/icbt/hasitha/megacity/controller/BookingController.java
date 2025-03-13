@@ -89,7 +89,7 @@ public class BookingController extends HttpServlet {
                 return;
             }
             LOGGER.info("validationResultDTO: {}", validationResultDTO);
-            ResultDTO<Boolean> resultDTO = bookingService.saveBooking(tripDetailsDTO);
+            ResultDTO<Boolean> resultDTO = bookingService.save(tripDetailsDTO);
 
             if (resultDTO.getData()) {
                 this.sendResponse.SendJsonResponse(resp, HttpServletResponse.SC_CREATED, "success", "Booking saved successfully", null);
