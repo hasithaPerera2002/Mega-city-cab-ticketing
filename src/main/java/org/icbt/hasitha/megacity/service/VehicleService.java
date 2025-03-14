@@ -38,7 +38,6 @@ public class VehicleService implements IVehicleService {
         try {
             LOGGER.info("Getting vehicles...");
             Vehicle[] vehicles = vehicleRepository.getVehicles();
-            LOGGER.info("Vehicles found: {}", Arrays.toString(vehicles));
 
             List<VehicleDTO> vehicleDTOs = Arrays.stream(vehicles)
                     .filter(Objects::nonNull)
@@ -55,7 +54,6 @@ public class VehicleService implements IVehicleService {
 
         } catch (Exception e) {
             LOGGER.error("Error getting vehicles: {}", e.getMessage());
-
         }
         return new VehicleDTO[0];
     }

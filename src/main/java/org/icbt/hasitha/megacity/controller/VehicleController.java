@@ -31,7 +31,6 @@ public class VehicleController extends HttpServlet {
         BufferedReader reader = req.getReader();
         LOGGER.info("Vehicle request received");
         String jwtToken = req.getHeader("Authorization");
-        LOGGER.info("token: {}",jwtToken);
         if (jwtToken == null || jwtToken.trim().isEmpty()) {
             this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Authorization token is required");
             return;
@@ -54,7 +53,6 @@ public class VehicleController extends HttpServlet {
         }
 
        ValidationResultDTO validationResultDTO = validateVehicle(vehicleDTO);
-        LOGGER.info("validation result: {}", validationResultDTO);
         if (!validationResultDTO.isValid()) {
             this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "error", "Invalid vehicle data", validationResultDTO.getError());
             return;
@@ -82,10 +80,8 @@ public class VehicleController extends HttpServlet {
             return;
         }
         String token = jwtToken.substring(7);
-        LOGGER.info("token: {}",token);
         token = token.trim();
         boolean isValid = JwtUtil.isTokenExpired(token);
-        LOGGER.info("token:{}",isValid);
         if (isValid) {
             LOGGER.info("Invalid token");
             this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Invalid token");

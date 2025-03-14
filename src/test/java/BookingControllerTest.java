@@ -49,7 +49,6 @@ class BookingControllerTest {
 
     @Test
     void testDoGetUnauthorized() throws IOException, ServletException {
-        // Mock the behavior of the HttpServletRequest to return a null Authorization header
         when(request.getHeader("Authorization")).thenReturn(null);
 
         PrintWriter writer = mock(PrintWriter.class);
@@ -98,9 +97,9 @@ class BookingControllerTest {
             JwtUtil.isTokenExpired("validToken");
 
             TripDetailsDTO trip = new TripDetailsDTO();
-            trip.setCustomerEmail("user@example.com");  // Ensure customerEmail is set
+            trip.setCustomerEmail("user@example.com");
             trip.setVehicleType("SUV");
-            trip.setDate(1625567889000L);  // Example timestamp
+            trip.setDate(1625567889000L);
             trip.setDestination("Matara");
             trip.setStartTime("13:00");
             trip.setFare("150.00");

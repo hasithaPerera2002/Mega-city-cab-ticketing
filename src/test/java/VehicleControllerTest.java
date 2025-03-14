@@ -1,22 +1,28 @@
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.google.gson.Gson;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.icbt.hasitha.megacity.controller.VehicleController;
 import org.icbt.hasitha.megacity.dto.ResultDTO;
-import org.icbt.hasitha.megacity.dto.ValidationResultDTO;
 import org.icbt.hasitha.megacity.dto.VehicleDTO;
 import org.icbt.hasitha.megacity.service.VehicleService;
 import org.icbt.hasitha.megacity.util.JwtUtil;
 import org.icbt.hasitha.megacity.util.SendResponse;
 import org.icbt.hasitha.megacity.util.enums.VehicleStatus;
 import org.icbt.hasitha.megacity.util.enums.VehicleTypes;
-import org.mockito.*;
-import org.junit.jupiter.api.*;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import java.io.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.MockitoAnnotations;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
 import java.util.UUID;
+
+import static org.mockito.Mockito.*;
 
 public class VehicleControllerTest {
 
@@ -67,7 +73,7 @@ public class VehicleControllerTest {
             PrintWriter writer = mock(PrintWriter.class);
             when(response.getWriter()).thenReturn(writer);
 
-            ResultDTO<Boolean> resultDTO = new ResultDTO<>( "Success", 500,true);
+            ResultDTO<Boolean> resultDTO = new ResultDTO<>("Success", 500, true);
             when(vehicleService.addVehicle(any(VehicleDTO.class))).thenReturn(resultDTO);
 
             vehicleController.doPost(request, response);
@@ -86,16 +92,8 @@ public class VehicleControllerTest {
             mockedJwtUtil.when(() -> JwtUtil.isAdmin("validToken")).thenReturn(true);
 
             // Initialize the VehicleDTO with required fields
-            VehicleDTO vehicleDTO = new VehicleDTO(
-                    UUID.randomUUID(),
-                    "",
-                    VehicleTypes.SUV,
-                    VehicleStatus.AVAILABLE,
-                    null,
-                    "1234567890123",
-                    "0712456884 ","5000908098","kamaaal@gmail.com"
-            );
- String vehicleJson = new Gson().toJson(vehicleDTO);
+            VehicleDTO vehicleDTO = new VehicleDTO(UUID.randomUUID(), "", VehicleTypes.SUV, VehicleStatus.AVAILABLE, null, "1234567890123", "0712456884 ", "5000908098", "kamaaal@gmail.com");
+            String vehicleJson = new Gson().toJson(vehicleDTO);
             BufferedReader reader = new BufferedReader(new StringReader(vehicleJson));
             when(request.getReader()).thenReturn(reader);
             PrintWriter writer = mock(PrintWriter.class);
@@ -106,7 +104,6 @@ public class VehicleControllerTest {
         }
     }
 
-    // Test for doGet: Unauthorized
     @Test
     void testDoGetUnauthorized() throws IOException, ServletException {
         when(request.getHeader("Authorization")).thenReturn(null);
@@ -115,15 +112,15 @@ public class VehicleControllerTest {
             mockedJwtUtil.when(() -> JwtUtil.isAdmin("validToken")).thenReturn(false);
 
             PrintWriter writer = mock(PrintWriter.class);
-        when(response.getWriter()).thenReturn(writer);
+            when(response.getWriter()).thenReturn(writer);
 
-        vehicleController.doGet(request, response);
+            vehicleController.doGet(request, response);
 
-        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        verify(writer).write(anyString());}
+            verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            verify(writer).write(anyString());
+        }
     }
 
-    // Test for doGet: Valid request
     @Test
     void testDoGetValid() throws IOException, ServletException {
         when(request.getHeader("Authorization")).thenReturn("Bearer validToken");
@@ -144,7 +141,6 @@ public class VehicleControllerTest {
         }
     }
 
-    // Test for doPut: Unauthorized
     @Test
     void testDoPutUnauthorized() throws IOException, ServletException {
         when(request.getHeader("Authorization")).thenReturn(null);
@@ -161,7 +157,6 @@ public class VehicleControllerTest {
         }
     }
 
-    // Test for doPut: Valid input
     @Test
     void testDoPutValid() throws IOException, ServletException {
         when(request.getHeader("Authorization")).thenReturn("Bearer validToken");
@@ -179,7 +174,7 @@ public class VehicleControllerTest {
             when(request.getReader()).thenReturn(reader);
             PrintWriter writer = mock(PrintWriter.class);
             when(response.getWriter()).thenReturn(writer);
-            ResultDTO<Boolean> resultDTO = new ResultDTO<>( "Vehicle updated successfully", 200,true);
+            ResultDTO<Boolean> resultDTO = new ResultDTO<>("Vehicle updated successfully", 200, true);
             vehicleController.doPut(request, response);
 
             verify(response).setStatus(HttpServletResponse.SC_OK);
@@ -187,7 +182,6 @@ public class VehicleControllerTest {
         }
     }
 
-    // Test for doDelete: Unauthorized
     @Test
     void testDoDeleteUnauthorized() throws IOException, ServletException {
         when(request.getHeader("Authorization")).thenReturn(null);
@@ -210,7 +204,7 @@ public class VehicleControllerTest {
             mockedJwtUtil.when(() -> JwtUtil.isAdmin("validToken")).thenReturn(true);
 
             when(request.getParameter("vehicleId")).thenReturn("d9f59a36-4781-46ac-9600-d1e8f2a0a8d5");
-            ResultDTO<Boolean> resultDTO = new ResultDTO<>("Vehicle deleted successfully",HttpServletResponse.SC_OK ,true);
+            ResultDTO<Boolean> resultDTO = new ResultDTO<>("Vehicle deleted successfully", HttpServletResponse.SC_OK, true);
             when(vehicleService.deleteVehicle(any(UUID.class))).thenReturn(resultDTO);
 
             PrintWriter writer = mock(PrintWriter.class);

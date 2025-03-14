@@ -49,25 +49,20 @@ public class UserControllerTest {
 
     @Test
     public void testLoginUser_Success() throws IOException, ServletException {
-        // Prepare input
         LoginDTO loginDTO = new LoginDTO("user@example.com", "asfafW123");
         StringReader stringReader = new StringReader(gson.toJson(loginDTO));
         when(request.getReader()).thenReturn(new BufferedReader(stringReader));
 
-        // Mock path
         when(request.getPathInfo()).thenReturn("/login");
 
-        // Mock valid user response
         LoginResponseDTO mockResponse = new LoginResponseDTO(true, "Login successful", "", RoleType.USER, "user@example.com");
 
         when(userService.validateUser(anyString(), anyString())).thenReturn(mockResponse);
 
-        // Mock response writer
         when(response.getWriter()).thenReturn(writer);
 
         userController.doPost(request, response);
 
-        // Verify response
         verify(response).setStatus(HttpServletResponse.SC_OK);
         verify(response).setHeader(eq("Authorization"), contains("Bearer"));
         verify(writer).write(anyString());
