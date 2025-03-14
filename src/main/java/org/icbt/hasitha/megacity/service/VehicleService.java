@@ -26,6 +26,7 @@ public class VehicleService implements IVehicleService {
         try {
             boolean flag = vehicleRepository.addVehicle(vehicle);
             return new ResultDTO<Boolean>("Vehicle added successfully", HttpServletResponse.SC_CREATED, flag);
+
         } catch (Exception e) {
             LOGGER.error("Error adding vehicle: {}", e.getMessage());
             return new ResultDTO<Boolean>(e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, false);
