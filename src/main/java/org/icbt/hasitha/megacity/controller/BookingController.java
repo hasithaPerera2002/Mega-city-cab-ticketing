@@ -38,16 +38,13 @@ public class BookingController extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         String token = req.getHeader("Authorization");
-        LOGGER.info("token: {}", token);
 
         if (token == null || token.trim().isEmpty()) {
             LOGGER.info("token is empty");
             sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Authorization token is required");
             return;
         }
-        LOGGER.info("token: {}", token);
         token = token.substring(7).trim();
         if (JwtUtil.isTokenExpired(token)) {
             LOGGER.info("token is expired");
@@ -67,7 +64,6 @@ public class BookingController extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String token = req.getHeader("Authorization");
-        LOGGER.info("token: {}", token);
         try {
             if (token == null || token.trim().isEmpty()) {
                 this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Authorization token is required");
@@ -85,12 +81,10 @@ public class BookingController extends HttpServlet {
             TripDetailsDTO tripDetailsDTO = gson.fromJson(reader, TripDetailsDTO.class);
             LOGGER.info("tripDetailsDTO: {}", tripDetailsDTO);
             ValidationResultDTO validationResultDTO = validateTripDetails(tripDetailsDTO, resp);
-            LOGGER.info("validationResultDTO: {}", validationResultDTO);
             if (!validationResultDTO.isValid()) {
                 this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "error", validationResultDTO.getMessage(), validationResultDTO.getError());
                 return;
             }
-            LOGGER.info("validationResultDTO: {}", validationResultDTO);
             ResultDTO<Boolean> resultDTO = bookingService.save(tripDetailsDTO);
 
             if (resultDTO.getData()) {
@@ -108,7 +102,6 @@ public class BookingController extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String token = req.getHeader("Authorization");
-        LOGGER.info("token: {}", token);
 
         if (token == null || token.trim().isEmpty()) {
             sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Authorization token is required");
@@ -124,13 +117,10 @@ public class BookingController extends HttpServlet {
         try {
             BufferedReader reader = req.getReader();
             TripDetailsDTO tripDetailsDTO = gson.fromJson(reader, TripDetailsDTO.class);
-            LOGGER.info("tripDetailsDTO: {}", tripDetailsDTO);
-
             if (tripDetailsDTO.getTripId() == null) {
                 sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "error", "Trip ID is required for update", null);
                 return;
             }
-
             ResultDTO<Boolean> resultDTO = bookingService.updateBooking(tripDetailsDTO);
             if (resultDTO.getData()) {
                 sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_OK, "success", "Booking updated successfully", null);
@@ -145,8 +135,6 @@ public class BookingController extends HttpServlet {
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String token = req.getHeader("Authorization");
-        LOGGER.info("token: {}", token);
-
         if (token == null || token.trim().isEmpty()) {
             sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "error", "Unauthorized access", "Authorization token is required");
             return;
@@ -180,7 +168,7 @@ public class BookingController extends HttpServlet {
 
     public ValidationResultDTO validateTripDetails(TripDetailsDTO trip, HttpServletResponse resp) throws IOException {
 
-        if ( trip.getCustomerEmail() == null || !trip.getCustomerEmail().matches("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$") ) {
+        if (trip.getCustomerEmail() == null || !trip.getCustomerEmail().matches("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$")) {
             return new ValidationResultDTO(false, "error", "Invalid customer email");
         }
 
@@ -190,13 +178,13 @@ public class BookingController extends HttpServlet {
         if (trip.getStartLocation().isEmpty()) {
             return new ValidationResultDTO(false, "error", "Invalid start location");
         }
-        if ( trip.getStartTime() == null || !trip.getStartTime().matches("^([01]\\d|2[0-3]):[0-5]\\d$")) {
+        if (trip.getStartTime() == null || !trip.getStartTime().matches("^([01]\\d|2[0-3]):[0-5]\\d$")) {
             return new ValidationResultDTO(false, "error", "Invalid start time");
         }
-        if (trip.getFare() == null ||!trip.getFare().matches("^\\d+(\\.\\d{1,12})?$")) {
+        if (trip.getFare() == null || !trip.getFare().matches("^\\d+(\\.\\d{1,12})?$")) {
             return new ValidationResultDTO(false, "error", "Invalid fare");
         }
-        if ( trip.getDistance() == null ||  !trip.getDistance().matches("^\\d+(\\.\\d{1,12})?$")) {
+        if (trip.getDistance() == null || !trip.getDistance().matches("^\\d+(\\.\\d{1,12})?$")) {
             return new ValidationResultDTO(false, "error", "Invalid distance");
         }
         if (!String.valueOf(trip.getPassengerCount()).matches("^[1-9]\\d*$")) {

@@ -170,7 +170,6 @@ public class VehicleRepo implements IVehicleRepo {
             LOGGER.info("Connected to database");
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    LOGGER.info("Query executed");
                     Vehicle[] vehicles = new Vehicle[resultSet.getMetaData().getColumnCount()];
                     LOGGER.info("Number of rows affected: " + resultSet.getMetaData().getColumnCount());
                     while (resultSet.next()) {
@@ -180,18 +179,12 @@ public class VehicleRepo implements IVehicleRepo {
                         vehicle.setVehicle_id(UUID.fromString(resultSet.getString("vehicle_id")));
                         vehicle.setVehicle_number(resultSet.getString("vehicle_number"));
                         vehicle.setVehicle_type(resultSet.getString("vehicle_type"));
-
                         vehicle.setStatus(VehicleStatus.valueOf(resultSet.getString("status")));
-
                         vehicle.setDriver_id(UUID.fromString(resultSet.getString("driver_id")));
                         vehicle.setDriver_name(resultSet.getString("driver_name"));
-                        LOGGER.info("Adding vehicle: {}", vehicle);
-
                         vehicle.setDriver_contact(resultSet.getString("driver_contact"));
                         vehicle.setDriver_nic(resultSet.getString("driver_nic"));
-                        LOGGER.info("Adding vehicle: {}", vehicle);
                         vehicle.setDriver_email(resultSet.getString("driver_email"));
-                        LOGGER.info("Adding vehicle: {}", vehicle);
                         vehicles[resultSet.getRow() - 1] = vehicle;
                     }
                     LOGGER.info(Arrays.toString(vehicles));
@@ -221,7 +214,7 @@ public class VehicleRepo implements IVehicleRepo {
         } catch (SQLException e) {
             LOGGER.error("Error fetching vehicle ID by type", e);
         }
-        return null; // Return null if no available vehicle is found
+        return null;
     }
 
 
