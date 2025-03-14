@@ -34,4 +34,13 @@ public class ValidationResultDTO {
     public void setError(String error) {
         this.error = error;
     }
+
+    @Override
+    public String toString() {
+        return "ValidationResultDTO{" +
+                "isValid=" + isValid +
+                ", message='" + message + '\'' +
+                ", error='" + error + '\'' +
+                '}';
+    }
 }
