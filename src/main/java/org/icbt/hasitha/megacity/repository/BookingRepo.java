@@ -126,15 +126,17 @@ public class BookingRepo {
         }
     }
 
-    public boolean deleteBooking(UUID tripId) throws SQLException {
+    public boolean deleteBooking(UUID tripId) throws SQLException,RuntimeException {
         LOGGER.info("Deleting booking with ID: {}", tripId);
 
         String query = "DELETE FROM trips WHERE trip_id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setObject(1, tripId);
+                System.out.println(stmt);
                 int deletedRows = stmt.executeUpdate();
-                LOGGER.info("Booking deleted successfully");
+                LOGGER.info("Booking deleted successfully: {}", deletedRows);
+
                 return deletedRows > 0;
             } catch (SQLException e) {
                 throw new RuntimeException(e);

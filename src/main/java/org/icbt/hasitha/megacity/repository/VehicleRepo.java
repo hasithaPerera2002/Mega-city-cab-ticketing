@@ -48,9 +48,15 @@ public class VehicleRepo implements IVehicleRepo {
 
     }
 
-    @Override
     public boolean updateVehicle(VehicleDTO vehicleDTO) {
-        LOGGER.info("Updating vehicle with ID: {}", vehicleDTO.getVehicle_id());
+        if (vehicleDTO == null || vehicleDTO.getVehicle_id() == null) {
+            return false;
+        }
+
+        VehicleDTO existingVehicle = getVehicleById(vehicleDTO.getVehicle_id());
+        if (existingVehicle == null) {
+            return false;
+        }
 
         String query = "UPDATE vehicles SET vehicle_number = ?, vehicle_type = ?, status = ?, " +
                 "driver_name = ?, driver_contact = ?, driver_nic = ?, driver_email = ? WHERE vehicle_id = ?";
@@ -58,23 +64,82 @@ public class VehicleRepo implements IVehicleRepo {
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, vehicleDTO.getVehicle_number());
-            stmt.setString(2, vehicleDTO.getVehicle_type().toString());
-            stmt.setString(3, vehicleDTO.getStatus().toString());
-            stmt.setString(4, vehicleDTO.getDriver_name());
-            stmt.setString(5, vehicleDTO.getDriver_contact());
-            stmt.setString(6, vehicleDTO.getDriver_nic());
-            stmt.setString(7, vehicleDTO.getDriver_email());
+            if (vehicleDTO.getVehicle_number() != null && !vehicleDTO.getVehicle_number().equals(existingVehicle.getVehicle_number())) {
+                stmt.setString(1, vehicleDTO.getVehicle_number());
+            } else {
+                stmt.setString(1, existingVehicle.getVehicle_number());
+            }
+
+            if (vehicleDTO.getVehicle_type() != null && !vehicleDTO.getVehicle_type().equals(existingVehicle.getVehicle_type())) {
+                stmt.setString(2, vehicleDTO.getVehicle_type().toString());
+            } else {
+                stmt.setString(2, existingVehicle.getVehicle_type().toString());
+            }
+
+            if (vehicleDTO.getStatus() != null && !vehicleDTO.getStatus().equals(existingVehicle.getStatus())) {
+                stmt.setString(3, vehicleDTO.getStatus().toString());
+            } else {
+                stmt.setString(3, existingVehicle.getStatus().toString());
+            }
+
+            if (vehicleDTO.getDriver_name() != null && !vehicleDTO.getDriver_name().equals(existingVehicle.getDriver_name())) {
+                stmt.setString(4, vehicleDTO.getDriver_name());
+            } else {
+                stmt.setString(4, existingVehicle.getDriver_name());
+            }
+
+            if (vehicleDTO.getDriver_contact() != null && !vehicleDTO.getDriver_contact().equals(existingVehicle.getDriver_contact())) {
+                stmt.setString(5, vehicleDTO.getDriver_contact());
+            } else {
+                stmt.setString(5, existingVehicle.getDriver_contact());
+            }
+
+            if (vehicleDTO.getDriver_nic() != null && !vehicleDTO.getDriver_nic().equals(existingVehicle.getDriver_nic())) {
+                stmt.setString(6, vehicleDTO.getDriver_nic());
+            } else {
+                stmt.setString(6, existingVehicle.getDriver_nic());
+            }
+
+            if (vehicleDTO.getDriver_email() != null && !vehicleDTO.getDriver_email().equals(existingVehicle.getDriver_email())) {
+                stmt.setString(7, vehicleDTO.getDriver_email());
+            } else {
+                stmt.setString(7, existingVehicle.getDriver_email());
+            }
+
             stmt.setObject(8, vehicleDTO.getVehicle_id());
 
             int rowsUpdated = stmt.executeUpdate();
-            LOGGER.info("Vehicle updated successfully");
             return rowsUpdated > 0;
 
         } catch (SQLException e) {
-            LOGGER.error("Error updating vehicle", e);
-            throw new RuntimeException("Failed to update vehicle", e);
+            return false;
         }
+    }
+
+    private VehicleDTO getVehicleById(UUID vehicleId) {
+        String query = "SELECT * FROM vehicles WHERE vehicle_id = ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setObject(1, vehicleId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                VehicleDTO vehicle = new VehicleDTO();
+                vehicle.setVehicle_id((UUID) rs.getObject("vehicle_id"));
+                vehicle.setVehicle_number(rs.getString("vehicle_number"));
+                vehicle.setVehicle_type(VehicleTypes.valueOf(rs.getString("vehicle_type")));
+                vehicle.setStatus(VehicleStatus.valueOf(rs.getString("status")));
+                vehicle.setDriver_name(rs.getString("driver_name"));
+                vehicle.setDriver_contact(rs.getString("driver_contact"));
+                vehicle.setDriver_nic(rs.getString("driver_nic"));
+                vehicle.setDriver_email(rs.getString("driver_email"));
+                return vehicle;
+            }
+        } catch (SQLException e) {
+            return null;
+        }
+        return null;
     }
 
     @Override
@@ -105,7 +170,6 @@ public class VehicleRepo implements IVehicleRepo {
             LOGGER.info("Connected to database");
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    LOGGER.info("Query executed");
                     Vehicle[] vehicles = new Vehicle[resultSet.getMetaData().getColumnCount()];
                     LOGGER.info("Number of rows affected: " + resultSet.getMetaData().getColumnCount());
                     while (resultSet.next()) {
@@ -115,18 +179,12 @@ public class VehicleRepo implements IVehicleRepo {
                         vehicle.setVehicle_id(UUID.fromString(resultSet.getString("vehicle_id")));
                         vehicle.setVehicle_number(resultSet.getString("vehicle_number"));
                         vehicle.setVehicle_type(resultSet.getString("vehicle_type"));
-
                         vehicle.setStatus(VehicleStatus.valueOf(resultSet.getString("status")));
-
                         vehicle.setDriver_id(UUID.fromString(resultSet.getString("driver_id")));
                         vehicle.setDriver_name(resultSet.getString("driver_name"));
-                        LOGGER.info("Adding vehicle: {}", vehicle);
-
                         vehicle.setDriver_contact(resultSet.getString("driver_contact"));
                         vehicle.setDriver_nic(resultSet.getString("driver_nic"));
-                        LOGGER.info("Adding vehicle: {}", vehicle);
                         vehicle.setDriver_email(resultSet.getString("driver_email"));
-                        LOGGER.info("Adding vehicle: {}", vehicle);
                         vehicles[resultSet.getRow() - 1] = vehicle;
                     }
                     LOGGER.info(Arrays.toString(vehicles));
@@ -156,7 +214,7 @@ public class VehicleRepo implements IVehicleRepo {
         } catch (SQLException e) {
             LOGGER.error("Error fetching vehicle ID by type", e);
         }
-        return null; // Return null if no available vehicle is found
+        return null;
     }
 
 

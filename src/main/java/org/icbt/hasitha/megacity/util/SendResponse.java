@@ -8,21 +8,25 @@ import java.io.IOException;
 public class SendResponse {
 
 
-    public void SendJsonResponse(HttpServletResponse resp, int statusCode, String statusKey, String message, String description) throws IOException {
-        JsonObject responseJson = new JsonObject();
-        responseJson.addProperty(statusKey, message);
-        if (description != null) {
-            responseJson.addProperty("description", description);
-            responseJson.addProperty("message", message);
-        }
+    public void sendJsonResponse(HttpServletResponse resp, int statusCode, String statusKey, String message, String description) throws IOException {
 
-        resp.setStatus(statusCode);
-        resp.setContentType("application/json");
-        resp.getWriter().write(responseJson.toString());
-        resp.getWriter().flush();
-        resp.getWriter().close();
+            JsonObject responseJson = new JsonObject();
+            responseJson.addProperty(statusKey, message);
+            if (description != null) {
+                responseJson.addProperty("description", description);
+            }
+            if( message != null) {
+                responseJson.addProperty("message", message);
+            }
+
+            resp.setStatus(statusCode);
+            resp.setContentType("application/json");
+            resp.getWriter().write(responseJson.toString());
+            resp.getWriter().flush();
+            resp.getWriter().close();
+
     }
-    public <T> void SendJsonResponseData(HttpServletResponse resp, int statusCode, String statusKey, String message, String description, T data) throws IOException {
+    public <T> void sendJsonResponseData(HttpServletResponse resp, int statusCode, String statusKey, String message, String description, T data) throws IOException {
         JsonObject responseJson = new JsonObject();
         responseJson.addProperty(statusKey, message);
         if (description != null) {

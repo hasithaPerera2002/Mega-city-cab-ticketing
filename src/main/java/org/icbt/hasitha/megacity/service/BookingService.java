@@ -57,13 +57,16 @@ public class BookingService implements IBookingService {
         }
     }
     @Override
-    public ResultDTO<Boolean> deleteBooking(UUID bookingId) {
+    public ResultDTO<Boolean> deleteBooking(UUID bookingId) throws RuntimeException {
         LOGGER.info("Deleting booking with ID: {}", bookingId);
         try {
             boolean flag = bookingRepo.deleteBooking(bookingId);
+            LOGGER.info(String.valueOf(flag));
             if (flag) {
+                LOGGER.info("Booking deleted successfully");
                 return new ResultDTO<>("Booking deleted successfully", HttpServletResponse.SC_OK, true);
             } else {
+                LOGGER.error("Booking not found or could not be deleted: {}", bookingId);
                 return new ResultDTO<>("Booking not found or could not be deleted", HttpServletResponse.SC_NOT_FOUND, false);
             }
         } catch (Exception e) {

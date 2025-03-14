@@ -26,6 +26,7 @@ public class VehicleService implements IVehicleService {
         try {
             boolean flag = vehicleRepository.addVehicle(vehicle);
             return new ResultDTO<Boolean>("Vehicle added successfully", HttpServletResponse.SC_CREATED, flag);
+
         } catch (Exception e) {
             LOGGER.error("Error adding vehicle: {}", e.getMessage());
             return new ResultDTO<Boolean>(e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, false);
@@ -37,7 +38,6 @@ public class VehicleService implements IVehicleService {
         try {
             LOGGER.info("Getting vehicles...");
             Vehicle[] vehicles = vehicleRepository.getVehicles();
-            LOGGER.info("Vehicles found: {}", Arrays.toString(vehicles));
 
             List<VehicleDTO> vehicleDTOs = Arrays.stream(vehicles)
                     .filter(Objects::nonNull)
@@ -54,7 +54,6 @@ public class VehicleService implements IVehicleService {
 
         } catch (Exception e) {
             LOGGER.error("Error getting vehicles: {}", e.getMessage());
-
         }
         return new VehicleDTO[0];
     }
