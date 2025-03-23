@@ -1,0 +1,356 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > VehicleController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.icbt.hasitha.megacity.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: VehicleController (org.icbt.hasitha.megacity.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">VehicleController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (7/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44.4%
+  </span>
+  <span class="absValue">
+    (32/72)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.8%
+  </span>
+  <span class="absValue">
+    (68/110)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.icbt.hasitha.megacity.controller;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.google.gson.Gson;
+&nbsp;import jakarta.servlet.ServletException;
+&nbsp;import jakarta.servlet.annotation.WebServlet;
+&nbsp;import jakarta.servlet.http.HttpServlet;
+&nbsp;import jakarta.servlet.http.HttpServletRequest;
+&nbsp;import jakarta.servlet.http.HttpServletResponse;
+&nbsp;import org.icbt.hasitha.megacity.dto.*;
+&nbsp;import org.icbt.hasitha.megacity.service.VehicleService;
+&nbsp;import org.icbt.hasitha.megacity.util.JwtUtil;
+&nbsp;import org.icbt.hasitha.megacity.util.SendResponse;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;@WebServlet (name = &quot;VehicleController&quot;, urlPatterns = &quot;/api/vehicle/*&quot;)
+<b class="fc">&nbsp;public class VehicleController extends HttpServlet {</b>
+<b class="fc">&nbsp;    private final Logger LOGGER = LoggerFactory.getLogger(VehicleController.class);</b>
+<b class="fc">&nbsp;    private final Gson gson = new Gson();</b>
+<b class="fc">&nbsp;    public final SendResponse sendResponse = new SendResponse();</b>
+<b class="fc">&nbsp;    public final VehicleService vehicleService = new VehicleService();</b>
+&nbsp;    @Override
+&nbsp;    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+<b class="fc">&nbsp;        BufferedReader reader = req.getReader();</b>
+<b class="fc">&nbsp;        LOGGER.info(&quot;Vehicle request received&quot;);</b>
+<b class="fc">&nbsp;        String jwtToken = req.getHeader(&quot;Authorization&quot;);</b>
+<b class="pc">&nbsp;        if (jwtToken == null || jwtToken.trim().isEmpty()) {</b>
+<b class="fc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, &quot;error&quot;, &quot;Unauthorized access&quot;, &quot;Authorization token is required&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="fc">&nbsp;        String token = jwtToken.substring(7);</b>
+&nbsp;
+<b class="fc">&nbsp;        token = token.trim();</b>
+<b class="fc">&nbsp;        boolean isValid = JwtUtil.isTokenExpired(token);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (isValid) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;token expired&quot;);</b>
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, &quot;error&quot;, &quot;Unauthorized access&quot;, &quot;Invalid token&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        VehicleDTO vehicleDTO = gson.fromJson(reader, VehicleDTO.class);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!JwtUtil.isAdmin(token)) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;Invalid token&quot;);</b>
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, &quot;error&quot;, &quot;Unauthorized access&quot;, &quot;Admin access required&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;       ValidationResultDTO validationResultDTO = validateVehicle(vehicleDTO);</b>
+<b class="pc">&nbsp;        if (!validationResultDTO.isValid()) {</b>
+<b class="fc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, &quot;error&quot;, &quot;Invalid vehicle data&quot;, validationResultDTO.getError());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;       ResultDTO&lt;Boolean&gt; resultDTO = vehicleService.addVehicle(vehicleDTO);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (resultDTO.getData()) {</b>
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_CREATED, &quot;success&quot;, &quot;Vehicle added successfully&quot;, null);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, &quot;error&quot;, &quot;Failed to add vehicle&quot;, resultDTO.getMessage());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+<b class="fc">&nbsp;        LOGGER.info(&quot;Vehicle request received&quot;);</b>
+<b class="fc">&nbsp;        BufferedReader reader = req.getReader();</b>
+<b class="fc">&nbsp;        String jwtToken = req.getHeader(&quot;Authorization&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        LOGGER.info(&quot;token:{}&quot;,jwtToken);</b>
+<b class="pc">&nbsp;        if (jwtToken == null || jwtToken.trim().isEmpty()) {</b>
+<b class="fc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, &quot;error&quot;, &quot;Unauthorized access&quot;, &quot;Authorization token is required&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="fc">&nbsp;        String token = jwtToken.substring(7);</b>
+<b class="fc">&nbsp;        token = token.trim();</b>
+<b class="fc">&nbsp;        boolean isValid = JwtUtil.isTokenExpired(token);</b>
+<b class="pc">&nbsp;        if (isValid) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;Invalid token&quot;);</b>
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, &quot;error&quot;, &quot;Unauthorized access&quot;, &quot;Invalid token&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            VehicleDTO[] vehicleDTOS= vehicleService.getVehicles();</b>
+<b class="fc">&nbsp;            String jsonResponse = new ObjectMapper().writeValueAsString(vehicleDTOS);</b>
+<b class="fc">&nbsp;            LOGGER.info(&quot;Generated JSON Response: {}&quot;, jsonResponse);</b>
+&nbsp;
+<b class="fc">&nbsp;            this.sendResponse.sendJsonResponseData(resp, HttpServletResponse.SC_OK, &quot;success&quot;, &quot;Vehicle data retrieved successfully&quot;,&quot;&quot;, jsonResponse);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse( resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, &quot;error&quot;, &quot;Failed to retrieve vehicle data&quot;, e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+&nbsp;
+<b class="fc">&nbsp;        String jwtToken = req.getHeader(&quot;Authorization&quot;);</b>
+<b class="pc">&nbsp;        if (jwtToken == null || jwtToken.trim().isEmpty()) {</b>
+<b class="fc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, &quot;error&quot;, &quot;Unauthorized access&quot;, &quot;Authorization token is required&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String token = jwtToken.substring(7).trim();</b>
+<b class="pc">&nbsp;        if (JwtUtil.isTokenExpired(token)) {</b>
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, &quot;error&quot;, &quot;Unauthorized access&quot;, &quot;Invalid token&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!JwtUtil.isAdmin(token)) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;Unauthorized update attempt&quot;);</b>
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, &quot;error&quot;, &quot;Unauthorized access&quot;, &quot;Admin access required&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="fc">&nbsp;        LOGGER.info(&quot;Vehicle update request received&quot;);</b>
+<b class="fc">&nbsp;        BufferedReader reader = req.getReader();</b>
+<b class="fc">&nbsp;        VehicleDTO vehicleDTO = gson.fromJson(reader, VehicleDTO.class);</b>
+<b class="fc">&nbsp;        LOGGER.info(&quot;Vehicle update details: &quot; + vehicleDTO);</b>
+&nbsp;
+<b class="fc">&nbsp;        ValidationResultDTO validationResultDTO = validateVehicleUpdate(vehicleDTO);</b>
+<b class="pc">&nbsp;        if (!validationResultDTO.isValid()) {</b>
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, &quot;error&quot;, &quot;Invalid vehicle data&quot;, validationResultDTO.getError());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        ResultDTO&lt;Boolean&gt; resultDTO = vehicleService.updateVehicle(vehicleDTO);</b>
+<b class="pc">&nbsp;        if (resultDTO.getData()) {</b>
+<b class="fc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_OK, &quot;success&quot;, &quot;Vehicle updated successfully&quot;, null);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, &quot;error&quot;, &quot;Failed to update vehicle&quot;, resultDTO.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+<b class="fc">&nbsp;        LOGGER.info(&quot;Vehicle delete request received&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        String jwtToken = req.getHeader(&quot;Authorization&quot;);</b>
+<b class="pc">&nbsp;        if (jwtToken == null || jwtToken.trim().isEmpty()) {</b>
+<b class="fc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, &quot;error&quot;, &quot;Unauthorized access&quot;, &quot;Authorization token is required&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String token = jwtToken.substring(7).trim();</b>
+<b class="pc">&nbsp;        if (JwtUtil.isTokenExpired(token)) {</b>
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, &quot;error&quot;, &quot;Unauthorized access&quot;, &quot;Invalid token&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!JwtUtil.isAdmin(token)) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;Unauthorized delete attempt&quot;);</b>
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, &quot;error&quot;, &quot;Unauthorized access&quot;, &quot;Admin access required&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String vehicleId = req.getParameter(&quot;vehicleId&quot;);</b>
+<b class="pc">&nbsp;        if (vehicleId == null || vehicleId.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, &quot;error&quot;, &quot;Invalid request&quot;, &quot;Vehicle ID is required&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        ResultDTO&lt;Boolean&gt; resultDTO = vehicleService.deleteVehicle(UUID.fromString(vehicleId));</b>
+<b class="pc">&nbsp;        if (resultDTO.getData()) {</b>
+<b class="nc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_OK, &quot;success&quot;, &quot;Vehicle deleted successfully&quot;, null);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            this.sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, &quot;error&quot;, &quot;Failed to delete vehicle&quot;, resultDTO.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public ValidationResultDTO validateVehicle(VehicleDTO vehicleDTO) {
+&nbsp;
+<b class="pc">&nbsp;        if (vehicleDTO.getVehicle_number() == null || vehicleDTO.getVehicle_number().isEmpty()) {</b>
+<b class="fc">&nbsp;            LOGGER.info(&quot;Vehicle number is required&quot;);</b>
+<b class="fc">&nbsp;            return new ValidationResultDTO(false, &quot;Vehicle number is required&quot;, &quot;Missing vehicle number&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (vehicleDTO.getVehicle_type() == null) {</b>
+<b class="nc">&nbsp;            return new ValidationResultDTO(false, &quot;Vehicle type is required&quot;, &quot;Missing vehicle type&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (vehicleDTO.getStatus() == null) {</b>
+<b class="fc">&nbsp;            return new ValidationResultDTO(false, &quot;Vehicle status is required&quot;, &quot;Missing vehicle status&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        if (vehicleDTO.getDriver_name() == null || vehicleDTO.getDriver_name().isEmpty()) {</b>
+<b class="nc">&nbsp;            return new ValidationResultDTO(false, &quot;Driver name is required&quot;, &quot;Missing driver name&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (vehicleDTO.getDriver_contact() == null || !isValidPhoneNumber(vehicleDTO.getDriver_contact())) {</b>
+<b class="nc">&nbsp;            return new ValidationResultDTO(false, &quot;Invalid driver contact number&quot;, &quot;Invalid phone number&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (vehicleDTO.getDriver_nic() == null || !isValidNIC(vehicleDTO.getDriver_nic())) {</b>
+<b class="nc">&nbsp;            return new ValidationResultDTO(false, &quot;Invalid driver NIC&quot;, &quot;Invalid NIC format&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (vehicleDTO.getDriver_email() == null || !isValidEmail(vehicleDTO.getDriver_email())) {</b>
+<b class="nc">&nbsp;            return new ValidationResultDTO(false, &quot;Invalid driver email&quot;, &quot;Invalid email format&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new ValidationResultDTO(true, &quot;Vehicle is valid&quot;, &quot;No errors&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isValidPhoneNumber(String phone) {
+<b class="nc">&nbsp;        String phoneRegex = &quot;^\\+?[0-9]{10,15}$&quot;;</b>
+<b class="nc">&nbsp;        Pattern pattern = Pattern.compile(phoneRegex);</b>
+<b class="nc">&nbsp;        Matcher matcher = pattern.matcher(phone);</b>
+<b class="nc">&nbsp;        return matcher.matches();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isValidNIC(String nic) {
+<b class="nc">&nbsp;        String nicRegex = &quot;^[0-9]{9}[VX]$&quot;;</b>
+<b class="nc">&nbsp;        return nic.matches(nicRegex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isValidEmail(String email) {
+<b class="nc">&nbsp;        String emailRegex = &quot;^[A-Za-z0-9+_.-]+@(.+)$&quot;;</b>
+<b class="nc">&nbsp;        Pattern pattern = Pattern.compile(emailRegex);</b>
+<b class="nc">&nbsp;        Matcher matcher = pattern.matcher(email);</b>
+<b class="nc">&nbsp;        return matcher.matches();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ValidationResultDTO validateVehicleUpdate(VehicleDTO vehicleDTO) {
+<b class="pc">&nbsp;        if (vehicleDTO.getVehicle_number() == null || vehicleDTO.getVehicle_number().isEmpty()) {</b>
+<b class="nc">&nbsp;            return new ValidationResultDTO(false, &quot;Vehicle number is required&quot;, &quot;Missing vehicle number&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return new ValidationResultDTO(true, &quot;Vehicle is valid&quot;, &quot;No errors&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-03-14 16:34</div>
+</div>
+</body>
+</html>
