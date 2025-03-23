@@ -54,7 +54,7 @@ public class BookingController extends HttpServlet {
         String userId = req.getParameter("userEmail");
         try {
             List<TripDetailsDTO> bookings = bookingService.getAllBookings(userId);
-            sendResponse.sendJsonResponseData(resp, HttpServletResponse.SC_OK, "success", "Bookings retrieved successfully", null, gson.toJson(bookings));
+            sendResponse.sendJsonResponseData(resp, HttpServletResponse.SC_OK, "success", "Bookings retrieved successfully", "Data fetched", gson.toJson(bookings));
 
         } catch (Exception e) {
             sendResponse.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "error", "Failed to retrieve booking", e.getMessage());
