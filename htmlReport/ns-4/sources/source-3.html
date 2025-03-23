@@ -1,0 +1,337 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > VehicleRepo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.icbt.hasitha.megacity.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: VehicleRepo (org.icbt.hasitha.megacity.repository)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">VehicleRepo</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    34.6%
+  </span>
+  <span class="absValue">
+    (18/52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.1%
+  </span>
+  <span class="absValue">
+    (77/113)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.icbt.hasitha.megacity.repository;
+&nbsp;
+&nbsp;import org.icbt.hasitha.megacity.dto.VehicleDTO;
+&nbsp;import org.icbt.hasitha.megacity.entity.Vehicle;
+&nbsp;import org.icbt.hasitha.megacity.repository.interfaces.IVehicleRepo;
+&nbsp;import org.icbt.hasitha.megacity.util.db.DBConnection;
+&nbsp;import org.icbt.hasitha.megacity.util.enums.VehicleStatus;
+&nbsp;import org.icbt.hasitha.megacity.util.enums.VehicleTypes;
+&nbsp;import org.slf4j.Logger;
+&nbsp;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.PreparedStatement;
+&nbsp;import java.sql.ResultSet;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.UUID;
+&nbsp;
+<b class="fc">&nbsp;public class VehicleRepo implements IVehicleRepo {</b>
+<b class="fc">&nbsp;    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(VehicleRepo.class);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean addVehicle(VehicleDTO vehicleDTO) {
+<b class="nc">&nbsp;        LOGGER.info(&quot;Adding new vehicle...&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        String query = &quot;INSERT INTO vehicles (vehicle_id, vehicle_number, vehicle_type,  status, driver_id, driver_name, driver_contact, driver_nic, driver_email) &quot; +</b>
+&nbsp;                &quot;VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;;
+&nbsp;
+<b class="nc">&nbsp;        try (Connection conn = DBConnection.getInstance().getConnection();</b>
+<b class="nc">&nbsp;             PreparedStatement stmt = conn.prepareStatement(query)) {</b>
+<b class="nc">&nbsp;            LOGGER.info(vehicleDTO.toString());</b>
+<b class="nc">&nbsp;            stmt.setObject(1, UUID.randomUUID());  // Generate unique vehicle ID</b>
+<b class="nc">&nbsp;            stmt.setString(2, vehicleDTO.getVehicle_number());</b>
+<b class="nc">&nbsp;            stmt.setString(3, vehicleDTO.getVehicle_type().toString());</b>
+<b class="nc">&nbsp;            stmt.setString(4, &quot;AVAILABLE&quot;);</b>
+<b class="nc">&nbsp;            stmt.setObject(5, UUID.randomUUID());</b>
+<b class="nc">&nbsp;            stmt.setString(6, vehicleDTO.getDriver_name());</b>
+<b class="nc">&nbsp;            stmt.setString(7, vehicleDTO.getDriver_contact());</b>
+<b class="nc">&nbsp;            stmt.setString(8, vehicleDTO.getDriver_nic());</b>
+<b class="nc">&nbsp;            stmt.setString(9, vehicleDTO.getDriver_email());</b>
+<b class="nc">&nbsp;            int rowsAffected = stmt.executeUpdate();</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;Vehicle added successfully&quot;);</b>
+<b class="nc">&nbsp;            return rowsAffected &gt; 0;</b>
+&nbsp;
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error adding vehicle&quot;, e);</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Failed to add vehicle&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean updateVehicle(VehicleDTO vehicleDTO) {
+<b class="pc">&nbsp;        if (vehicleDTO == null || vehicleDTO.getVehicle_id() == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        VehicleDTO existingVehicle = getVehicleById(vehicleDTO.getVehicle_id());</b>
+<b class="pc">&nbsp;        if (existingVehicle == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String query = &quot;UPDATE vehicles SET vehicle_number = ?, vehicle_type = ?, status = ?, &quot; +</b>
+&nbsp;                &quot;driver_name = ?, driver_contact = ?, driver_nic = ?, driver_email = ? WHERE vehicle_id = ?&quot;;
+&nbsp;
+<b class="pc">&nbsp;        try (Connection conn = DBConnection.getInstance().getConnection();</b>
+<b class="fc">&nbsp;             PreparedStatement stmt = conn.prepareStatement(query)) {</b>
+&nbsp;
+<b class="pc">&nbsp;            if (vehicleDTO.getVehicle_number() != null &amp;&amp; !vehicleDTO.getVehicle_number().equals(existingVehicle.getVehicle_number())) {</b>
+<b class="nc">&nbsp;                stmt.setString(1, vehicleDTO.getVehicle_number());</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                stmt.setString(1, existingVehicle.getVehicle_number());</b>
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (vehicleDTO.getVehicle_type() != null &amp;&amp; !vehicleDTO.getVehicle_type().equals(existingVehicle.getVehicle_type())) {</b>
+<b class="nc">&nbsp;                stmt.setString(2, vehicleDTO.getVehicle_type().toString());</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                stmt.setString(2, existingVehicle.getVehicle_type().toString());</b>
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (vehicleDTO.getStatus() != null &amp;&amp; !vehicleDTO.getStatus().equals(existingVehicle.getStatus())) {</b>
+<b class="nc">&nbsp;                stmt.setString(3, vehicleDTO.getStatus().toString());</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                stmt.setString(3, existingVehicle.getStatus().toString());</b>
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (vehicleDTO.getDriver_name() != null &amp;&amp; !vehicleDTO.getDriver_name().equals(existingVehicle.getDriver_name())) {</b>
+<b class="nc">&nbsp;                stmt.setString(4, vehicleDTO.getDriver_name());</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                stmt.setString(4, existingVehicle.getDriver_name());</b>
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (vehicleDTO.getDriver_contact() != null &amp;&amp; !vehicleDTO.getDriver_contact().equals(existingVehicle.getDriver_contact())) {</b>
+<b class="nc">&nbsp;                stmt.setString(5, vehicleDTO.getDriver_contact());</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                stmt.setString(5, existingVehicle.getDriver_contact());</b>
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (vehicleDTO.getDriver_nic() != null &amp;&amp; !vehicleDTO.getDriver_nic().equals(existingVehicle.getDriver_nic())) {</b>
+<b class="nc">&nbsp;                stmt.setString(6, vehicleDTO.getDriver_nic());</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                stmt.setString(6, existingVehicle.getDriver_nic());</b>
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (vehicleDTO.getDriver_email() != null &amp;&amp; !vehicleDTO.getDriver_email().equals(existingVehicle.getDriver_email())) {</b>
+<b class="nc">&nbsp;                stmt.setString(7, vehicleDTO.getDriver_email());</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                stmt.setString(7, existingVehicle.getDriver_email());</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            stmt.setObject(8, vehicleDTO.getVehicle_id());</b>
+&nbsp;
+<b class="fc">&nbsp;            int rowsUpdated = stmt.executeUpdate();</b>
+<b class="pc">&nbsp;            return rowsUpdated &gt; 0;</b>
+&nbsp;
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private VehicleDTO getVehicleById(UUID vehicleId) {
+<b class="fc">&nbsp;        String query = &quot;SELECT * FROM vehicles WHERE vehicle_id = ?&quot;;</b>
+<b class="fc">&nbsp;        try (Connection conn = DBConnection.getInstance().getConnection();</b>
+<b class="fc">&nbsp;             PreparedStatement stmt = conn.prepareStatement(query)) {</b>
+&nbsp;
+<b class="fc">&nbsp;            stmt.setObject(1, vehicleId);</b>
+<b class="fc">&nbsp;            ResultSet rs = stmt.executeQuery();</b>
+&nbsp;
+<b class="pc">&nbsp;            if (rs.next()) {</b>
+<b class="fc">&nbsp;                VehicleDTO vehicle = new VehicleDTO();</b>
+<b class="fc">&nbsp;                vehicle.setVehicle_id((UUID) rs.getObject(&quot;vehicle_id&quot;));</b>
+<b class="fc">&nbsp;                vehicle.setVehicle_number(rs.getString(&quot;vehicle_number&quot;));</b>
+<b class="fc">&nbsp;                vehicle.setVehicle_type(VehicleTypes.valueOf(rs.getString(&quot;vehicle_type&quot;)));</b>
+<b class="fc">&nbsp;                vehicle.setStatus(VehicleStatus.valueOf(rs.getString(&quot;status&quot;)));</b>
+<b class="fc">&nbsp;                vehicle.setDriver_name(rs.getString(&quot;driver_name&quot;));</b>
+<b class="fc">&nbsp;                vehicle.setDriver_contact(rs.getString(&quot;driver_contact&quot;));</b>
+<b class="fc">&nbsp;                vehicle.setDriver_nic(rs.getString(&quot;driver_nic&quot;));</b>
+<b class="fc">&nbsp;                vehicle.setDriver_email(rs.getString(&quot;driver_email&quot;));</b>
+<b class="fc">&nbsp;                return vehicle;</b>
+&nbsp;            }
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean deleteVehicle(UUID vehicleId) {
+<b class="fc">&nbsp;        LOGGER.info(&quot;Deleting vehicle with ID: {}&quot;, vehicleId);</b>
+&nbsp;
+<b class="fc">&nbsp;        String query = &quot;DELETE FROM vehicles WHERE vehicle_id = ?&quot;;</b>
+&nbsp;
+<b class="pc">&nbsp;        try (Connection conn = DBConnection.getInstance().getConnection();</b>
+<b class="fc">&nbsp;             PreparedStatement stmt = conn.prepareStatement(query)) {</b>
+&nbsp;
+<b class="fc">&nbsp;            stmt.setObject(1, vehicleId);</b>
+&nbsp;
+<b class="fc">&nbsp;            int rowsDeleted = stmt.executeUpdate();</b>
+<b class="fc">&nbsp;            LOGGER.info(&quot;Vehicle deleted successfully&quot;);</b>
+<b class="pc">&nbsp;            return rowsDeleted &gt; 0;</b>
+&nbsp;
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error deleting vehicle&quot;, e);</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Failed to delete vehicle&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Vehicle[] getVehicles() {
+<b class="fc">&nbsp;        String query = &quot;SELECT * FROM vehicles&quot;;</b>
+<b class="fc">&nbsp;        try (Connection connection = DBConnection.getInstance().getConnection()) {</b>
+<b class="fc">&nbsp;            LOGGER.info(&quot;Connected to database&quot;);</b>
+<b class="fc">&nbsp;            try (PreparedStatement statement = connection.prepareStatement(query)) {</b>
+<b class="fc">&nbsp;                try (ResultSet resultSet = statement.executeQuery()) {</b>
+<b class="fc">&nbsp;                    Vehicle[] vehicles = new Vehicle[resultSet.getMetaData().getColumnCount()];</b>
+<b class="fc">&nbsp;                    LOGGER.info(&quot;Number of rows affected: &quot; + resultSet.getMetaData().getColumnCount());</b>
+<b class="fc">&nbsp;                    while (resultSet.next()) {</b>
+<b class="fc">&nbsp;                        Vehicle vehicle = new Vehicle();</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;                        vehicle.setVehicle_id(UUID.fromString(resultSet.getString(&quot;vehicle_id&quot;)));</b>
+<b class="fc">&nbsp;                        vehicle.setVehicle_number(resultSet.getString(&quot;vehicle_number&quot;));</b>
+<b class="fc">&nbsp;                        vehicle.setVehicle_type(resultSet.getString(&quot;vehicle_type&quot;));</b>
+<b class="fc">&nbsp;                        vehicle.setStatus(VehicleStatus.valueOf(resultSet.getString(&quot;status&quot;)));</b>
+<b class="fc">&nbsp;                        vehicle.setDriver_id(UUID.fromString(resultSet.getString(&quot;driver_id&quot;)));</b>
+<b class="fc">&nbsp;                        vehicle.setDriver_name(resultSet.getString(&quot;driver_name&quot;));</b>
+<b class="fc">&nbsp;                        vehicle.setDriver_contact(resultSet.getString(&quot;driver_contact&quot;));</b>
+<b class="fc">&nbsp;                        vehicle.setDriver_nic(resultSet.getString(&quot;driver_nic&quot;));</b>
+<b class="fc">&nbsp;                        vehicle.setDriver_email(resultSet.getString(&quot;driver_email&quot;));</b>
+<b class="fc">&nbsp;                        vehicles[resultSet.getRow() - 1] = vehicle;</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    LOGGER.info(Arrays.toString(vehicles));</b>
+<b class="fc">&nbsp;                    return vehicles;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public UUID getVehicleIdByType(VehicleTypes vehicleType) {
+<b class="fc">&nbsp;        String query = &quot;SELECT vehicle_id FROM vehicles WHERE vehicle_type = ? AND status = &#39;AVAILABLE&#39; LIMIT 1&quot;;</b>
+&nbsp;
+<b class="fc">&nbsp;        try (Connection conn = DBConnection.getInstance().getConnection();</b>
+<b class="fc">&nbsp;             PreparedStatement stmt = conn.prepareStatement(query)) {</b>
+&nbsp;
+<b class="fc">&nbsp;            stmt.setString(1, vehicleType.name()); // Set enum name as string</b>
+&nbsp;
+<b class="fc">&nbsp;            try (ResultSet rs = stmt.executeQuery()) {</b>
+<b class="pc">&nbsp;                if (rs.next()) {</b>
+<b class="fc">&nbsp;                    return UUID.fromString(rs.getString(&quot;vehicle_id&quot;));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error fetching vehicle ID by type&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-03-14 16:34</div>
+</div>
+</body>
+</html>

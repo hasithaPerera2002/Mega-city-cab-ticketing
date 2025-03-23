@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Trip</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.icbt.hasitha.megacity.entity</a>
+</div>
+
+<h1>Coverage Summary for Class: Trip (org.icbt.hasitha.megacity.entity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Trip</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.3%
+  </span>
+  <span class="absValue">
+    (21/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.6%
+  </span>
+  <span class="absValue">
+    (21/33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.icbt.hasitha.megacity.entity;
+&nbsp;
+&nbsp;import java.util.Date;
+&nbsp;
+&nbsp;public class Trip {
+&nbsp;
+&nbsp;    private String tripId;
+&nbsp;    private String vehicleId;
+&nbsp;    private String customerId;
+&nbsp;    private long date;
+&nbsp;    private String destination;
+&nbsp;    private String startLocation;
+&nbsp;    private String startTime;
+&nbsp;    private String fare;
+&nbsp;    private String distance;
+&nbsp;    private int passengerCount;
+&nbsp;
+<b class="fc">&nbsp;    public Trip() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    public Trip(String tripId, String vehicleId, String customerId, long date, String destination, String startLocation, String startTime, String fare, String distance, int passengerCount) {</b>
+<b class="nc">&nbsp;        this.tripId = tripId;</b>
+<b class="nc">&nbsp;        this.vehicleId = vehicleId;</b>
+<b class="nc">&nbsp;        this.customerId = customerId;</b>
+<b class="nc">&nbsp;        this.date = date;</b>
+<b class="nc">&nbsp;        this.destination = destination;</b>
+<b class="nc">&nbsp;        this.startLocation = startLocation;</b>
+<b class="nc">&nbsp;        this.startTime = startTime;</b>
+<b class="nc">&nbsp;        this.fare = fare;</b>
+<b class="nc">&nbsp;        this.distance = distance;</b>
+<b class="nc">&nbsp;        this.passengerCount = passengerCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTripId() {
+<b class="fc">&nbsp;        return tripId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTripId(String tripId) {
+<b class="fc">&nbsp;        this.tripId = tripId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getVehicleId() {
+<b class="fc">&nbsp;        return vehicleId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setVehicleId(String vehicleId) {
+<b class="fc">&nbsp;        this.vehicleId = vehicleId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCustomerId() {
+<b class="fc">&nbsp;        return customerId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCustomerId(String customerId) {
+<b class="fc">&nbsp;        this.customerId = customerId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public long getDate() {
+<b class="fc">&nbsp;        return date;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDate(long date) {
+<b class="fc">&nbsp;        this.date = date;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDestination() {
+<b class="fc">&nbsp;        return destination;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDestination(String destination) {
+<b class="fc">&nbsp;        this.destination = destination;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getStartLocation() {
+<b class="fc">&nbsp;        return startLocation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setStartLocation(String startLocation) {
+<b class="fc">&nbsp;        this.startLocation = startLocation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getStartTime() {
+<b class="fc">&nbsp;        return startTime;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setStartTime(String startTime) {
+<b class="fc">&nbsp;        this.startTime = startTime;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFare() {
+<b class="fc">&nbsp;        return fare;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFare(String fare) {
+<b class="fc">&nbsp;        this.fare = fare;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDistance() {
+<b class="fc">&nbsp;        return distance;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDistance(String distance) {
+<b class="fc">&nbsp;        this.distance = distance;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getPassengerCount() {
+<b class="fc">&nbsp;        return passengerCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPassengerCount(int passengerCount) {
+<b class="fc">&nbsp;        this.passengerCount = passengerCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;Trip{&quot; +</b>
+&nbsp;                &quot;tripId=&#39;&quot; + tripId + &#39;\&#39;&#39; +
+&nbsp;                &quot;, vehicleId=&#39;&quot; + vehicleId + &#39;\&#39;&#39; +
+&nbsp;                &quot;, customerId=&#39;&quot; + customerId + &#39;\&#39;&#39; +
+&nbsp;                &quot;, date=&quot; + date +
+&nbsp;                &quot;, destination=&#39;&quot; + destination + &#39;\&#39;&#39; +
+&nbsp;                &quot;, startLocation=&#39;&quot; + startLocation + &#39;\&#39;&#39; +
+&nbsp;                &quot;, startTime=&#39;&quot; + startTime + &#39;\&#39;&#39; +
+&nbsp;                &quot;, fare=&#39;&quot; + fare + &#39;\&#39;&#39; +
+&nbsp;                &quot;, distance=&#39;&quot; + distance + &#39;\&#39;&#39; +
+&nbsp;                &quot;, passengerCount=&quot; + passengerCount +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-03-14 16:34</div>
+</div>
+</body>
+</html>

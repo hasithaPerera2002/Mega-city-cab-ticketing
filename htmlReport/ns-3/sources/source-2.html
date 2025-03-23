@@ -1,0 +1,213 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > User</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.icbt.hasitha.megacity.entity</a>
+</div>
+
+<h1>Coverage Summary for Class: User (org.icbt.hasitha.megacity.entity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">User</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.8%
+  </span>
+  <span class="absValue">
+    (5/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (10/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.icbt.hasitha.megacity.entity;
+&nbsp;
+&nbsp;import org.icbt.hasitha.megacity.util.enums.RoleType;
+&nbsp;
+&nbsp;import java.util.UUID;
+&nbsp;
+&nbsp;public class User {
+&nbsp;    private UUID user_id;
+&nbsp;    private String username;
+&nbsp;    private String password_hash;
+&nbsp;    private String email;
+&nbsp;    private String phone_number;
+&nbsp;    private String address;
+&nbsp;    private RoleType role;
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    public User() {</b>
+&nbsp;    }
+<b class="nc">&nbsp;    public User(UUID user_id, String username, String password_hash, String email, String phone_number, String address, RoleType role) {</b>
+<b class="nc">&nbsp;        this.user_id = user_id;</b>
+<b class="nc">&nbsp;        this.username = username;</b>
+<b class="nc">&nbsp;        this.password_hash = password_hash;</b>
+<b class="nc">&nbsp;        this.email = email;</b>
+<b class="nc">&nbsp;        this.phone_number = phone_number;</b>
+<b class="nc">&nbsp;        this.address = address;</b>
+<b class="nc">&nbsp;        this.role = role;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;            public  User( UUID user_id, String username, String passwordHash, String email, RoleType role) {</b>
+<b class="fc">&nbsp;        this.user_id = user_id;</b>
+<b class="fc">&nbsp;        this.username = username;</b>
+<b class="fc">&nbsp;        this.password_hash = passwordHash;</b>
+<b class="fc">&nbsp;        this.email = email;</b>
+<b class="fc">&nbsp;        this.role = role;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public UUID getUser_id() {
+<b class="fc">&nbsp;        return user_id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUser_id(UUID user_id) {
+<b class="nc">&nbsp;        this.user_id = user_id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getUsername() {
+<b class="nc">&nbsp;        return username;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUsername(String username) {
+<b class="nc">&nbsp;        this.username = username;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getPassword_hash() {
+<b class="fc">&nbsp;        return password_hash;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPassword_hash(String password_hash) {
+<b class="nc">&nbsp;        this.password_hash = password_hash;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getEmail() {
+<b class="fc">&nbsp;        return email;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEmail(String email) {
+<b class="nc">&nbsp;        this.email = email;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getPhone_number() {
+<b class="nc">&nbsp;        return phone_number;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPhone_number(String phone_number) {
+<b class="nc">&nbsp;        this.phone_number = phone_number;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAddress() {
+<b class="nc">&nbsp;        return address;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAddress(String address) {
+<b class="nc">&nbsp;        this.address = address;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RoleType getRole() {
+<b class="fc">&nbsp;        return role;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setRole(RoleType role) {
+<b class="nc">&nbsp;        this.role = role;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;User{&quot; +</b>
+&nbsp;                &quot;user_id=&quot; + user_id +
+&nbsp;                &quot;, username=&#39;&quot; + username + &#39;\&#39;&#39; +
+&nbsp;                &quot;, password_hash=&#39;&quot; + password_hash + &#39;\&#39;&#39; +
+&nbsp;                &quot;, email=&#39;&quot; + email + &#39;\&#39;&#39; +
+&nbsp;                &quot;, phone_number=&#39;&quot; + phone_number + &#39;\&#39;&#39; +
+&nbsp;                &quot;, address=&#39;&quot; + address + &#39;\&#39;&#39; +
+&nbsp;                &quot;, role=&#39;&quot; + role + &#39;\&#39;&#39; +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-03-14 16:34</div>
+</div>
+</body>
+</html>

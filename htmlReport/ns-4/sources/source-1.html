@@ -1,0 +1,263 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BookingRepo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.icbt.hasitha.megacity.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: BookingRepo (org.icbt.hasitha.megacity.repository)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BookingRepo</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (4/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.4%
+  </span>
+  <span class="absValue">
+    (58/86)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.icbt.hasitha.megacity.repository;
+&nbsp;
+&nbsp;import org.icbt.hasitha.megacity.dto.TripDetailsDTO;
+&nbsp;import org.icbt.hasitha.megacity.entity.Trip;
+&nbsp;import org.icbt.hasitha.megacity.entity.User;
+&nbsp;import org.icbt.hasitha.megacity.util.db.DBConnection;
+&nbsp;import org.icbt.hasitha.megacity.util.enums.VehicleTypes;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import java.sql.*;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.UUID;
+&nbsp;
+<b class="fc">&nbsp;public class BookingRepo {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BookingRepo.class);</b>
+<b class="fc">&nbsp;    private final UserRepo userRepo = new UserRepo();</b>
+<b class="fc">&nbsp;    private final VehicleRepo vehicleRepo = new VehicleRepo();</b>
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    public boolean saveBooking(TripDetailsDTO trip) {
+<b class="fc">&nbsp;        LOGGER.info(&quot;Booking save start&quot;);</b>
+&nbsp;        User user;
+&nbsp;        UUID vehicleId;
+&nbsp;        try {
+<b class="fc">&nbsp;         user =   this.userRepo.findUserByEmail(trip.getCustomerEmail());</b>
+<b class="fc">&nbsp;         LOGGER.info(&quot;User found&quot;);</b>
+<b class="fc">&nbsp;            vehicleId= this.vehicleRepo.getVehicleIdByType(VehicleTypes.valueOf(trip.getVehicleType()));</b>
+<b class="fc">&nbsp;            LOGGER.info(&quot;Vehicle found&quot;);</b>
+&nbsp;
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        String  query = &quot;INSERT INTO trips (trip_id, vehicle_id, customer_id, date, destination, starttime, fare, distance, passenger_count, starting_location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;;</b>
+<b class="fc">&nbsp;        try (Connection conn = DBConnection.getInstance().getConnection()) {</b>
+<b class="fc">&nbsp;            conn.setAutoCommit(false);</b>
+<b class="fc">&nbsp;            LOGGER.info(trip.toString());</b>
+<b class="fc">&nbsp;            try (PreparedStatement stmt = conn.prepareStatement(query)) {</b>
+<b class="fc">&nbsp;                stmt.setObject(1, UUID.randomUUID());</b>
+<b class="fc">&nbsp;                stmt.setObject(2, vehicleId);</b>
+<b class="fc">&nbsp;                stmt.setObject(3, user.getUser_id());</b>
+<b class="fc">&nbsp;                stmt.setDate(4, new java.sql.Date(trip.getDate()));</b>
+<b class="fc">&nbsp;                stmt.setString(5, trip.getDestination());</b>
+<b class="fc">&nbsp;                stmt.setString(6, trip.getStartTime());</b>
+<b class="fc">&nbsp;                stmt.setDouble(7, Double.parseDouble(trip.getFare()));</b>
+<b class="fc">&nbsp;                stmt.setString(8, trip.getDistance());</b>
+<b class="fc">&nbsp;                stmt.setInt(9, trip.getPassengerCount());</b>
+<b class="fc">&nbsp;                stmt.setString(10, trip.getStartLocation());</b>
+<b class="fc">&nbsp;                int i = stmt.executeUpdate();</b>
+<b class="fc">&nbsp;                conn.commit();</b>
+<b class="fc">&nbsp;                LOGGER.info(&quot;Booking saved successfully&quot;);</b>
+<b class="pc">&nbsp;                return i &gt; 0;</b>
+&nbsp;            } catch (SQLException e) {
+<b class="nc">&nbsp;                conn.rollback();</b>
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+&nbsp;            }
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Trip&gt; getTrips(String email) throws SQLException {
+<b class="fc">&nbsp;        User user = this.userRepo.findUserByEmail(email);</b>
+<b class="fc">&nbsp;        String query = &quot;SELECT * FROM trips where customer_id = ?&quot;;</b>
+<b class="fc">&nbsp;        try (Connection conn = DBConnection.getInstance().getConnection()){</b>
+<b class="fc">&nbsp;            try (PreparedStatement stmt = conn.prepareStatement(query)) {</b>
+<b class="fc">&nbsp;                stmt.setObject(1, user.getUser_id());</b>
+<b class="fc">&nbsp;                ResultSet rs = stmt.executeQuery();</b>
+<b class="fc">&nbsp;                List&lt;Trip&gt; trips = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;                while (rs.next()) {</b>
+<b class="fc">&nbsp;                    Trip trip = new Trip();</b>
+<b class="fc">&nbsp;                    trip.setTripId(rs.getString(&quot;trip_id&quot;));</b>
+<b class="fc">&nbsp;                    trip.setVehicleId(rs.getString(&quot;vehicle_id&quot;));</b>
+<b class="fc">&nbsp;                    trip.setCustomerId(rs.getString(&quot;customer_id&quot;));</b>
+<b class="fc">&nbsp;                    trip.setDate(rs.getDate(&quot;date&quot;).getTime());</b>
+<b class="fc">&nbsp;                    trip.setDestination(rs.getString(&quot;destination&quot;));</b>
+<b class="fc">&nbsp;                    trip.setStartTime(rs.getString(&quot;starttime&quot;));</b>
+<b class="fc">&nbsp;                    trip.setFare(String.valueOf(rs.getDouble(&quot;fare&quot;)));</b>
+<b class="fc">&nbsp;                    trip.setDistance(rs.getString(&quot;distance&quot;));</b>
+<b class="fc">&nbsp;                    trip.setPassengerCount(rs.getInt(&quot;passenger_count&quot;));</b>
+<b class="fc">&nbsp;                    trip.setStartLocation(rs.getString(&quot;starting_location&quot;));</b>
+<b class="fc">&nbsp;                    trips.add(trip);</b>
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                return trips;</b>
+&nbsp;
+&nbsp;            } catch (SQLException e) {
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean updateBooking(TripDetailsDTO trip) {
+<b class="nc">&nbsp;        LOGGER.info(&quot;Updating booking with ID: {}&quot;, trip.getTripId());</b>
+&nbsp;
+<b class="nc">&nbsp;        String query = &quot;UPDATE trips SET vehicle_id = ?, date = ?, destination = ?, starttime = ?, fare = ?, distance = ?, passenger_count = ?, starting_location = ? WHERE trip_id = ?&quot;;</b>
+<b class="nc">&nbsp;        try (Connection conn = DBConnection.getInstance().getConnection()) {</b>
+<b class="nc">&nbsp;            conn.setAutoCommit(false);</b>
+<b class="nc">&nbsp;            try (PreparedStatement stmt = conn.prepareStatement(query)) {</b>
+<b class="nc">&nbsp;                stmt.setObject(1, this.vehicleRepo.getVehicleIdByType(VehicleTypes.valueOf(trip.getVehicleType())));</b>
+<b class="nc">&nbsp;                stmt.setDate(2, new java.sql.Date(trip.getDate()));</b>
+<b class="nc">&nbsp;                stmt.setString(3, trip.getDestination());</b>
+<b class="nc">&nbsp;                stmt.setString(4, trip.getStartTime());</b>
+<b class="nc">&nbsp;                stmt.setDouble(5, Double.parseDouble(trip.getFare()));</b>
+<b class="nc">&nbsp;                stmt.setString(6, trip.getDistance());</b>
+<b class="nc">&nbsp;                stmt.setInt(7, trip.getPassengerCount());</b>
+<b class="nc">&nbsp;                stmt.setString(8, trip.getStartLocation());</b>
+<b class="nc">&nbsp;                stmt.setObject(9, UUID.fromString(trip.getTripId()));</b>
+&nbsp;
+<b class="nc">&nbsp;                int updatedRows = stmt.executeUpdate();</b>
+<b class="nc">&nbsp;                conn.commit();</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;Booking updated successfully&quot;);</b>
+<b class="nc">&nbsp;                return updatedRows &gt; 0;</b>
+&nbsp;            } catch (SQLException e) {
+<b class="nc">&nbsp;                conn.rollback();</b>
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+&nbsp;            }
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean deleteBooking(UUID tripId) throws SQLException,RuntimeException {
+<b class="fc">&nbsp;        LOGGER.info(&quot;Deleting booking with ID: {}&quot;, tripId);</b>
+&nbsp;
+<b class="fc">&nbsp;        String query = &quot;DELETE FROM trips WHERE trip_id = ?&quot;;</b>
+<b class="fc">&nbsp;        try (Connection conn = DBConnection.getInstance().getConnection()) {</b>
+<b class="fc">&nbsp;            try (PreparedStatement stmt = conn.prepareStatement(query)) {</b>
+<b class="fc">&nbsp;                stmt.setObject(1, tripId);</b>
+<b class="fc">&nbsp;                System.out.println(stmt);</b>
+<b class="fc">&nbsp;                int deletedRows = stmt.executeUpdate();</b>
+<b class="fc">&nbsp;                LOGGER.info(&quot;Booking deleted successfully: {}&quot;, deletedRows);</b>
+&nbsp;
+<b class="pc">&nbsp;                return deletedRows &gt; 0;</b>
+&nbsp;            } catch (SQLException e) {
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-03-14 16:34</div>
+</div>
+</body>
+</html>

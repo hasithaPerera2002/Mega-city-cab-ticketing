@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BookingService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.icbt.hasitha.megacity.service</a>
+</div>
+
+<h1>Coverage Summary for Class: BookingService (org.icbt.hasitha.megacity.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BookingService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (3/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.4%
+  </span>
+  <span class="absValue">
+    (34/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.icbt.hasitha.megacity.service;
+&nbsp;
+&nbsp;import jakarta.servlet.http.HttpServletResponse;
+&nbsp;import org.icbt.hasitha.megacity.dto.ResultDTO;
+&nbsp;import org.icbt.hasitha.megacity.dto.TripDetailsDTO;
+&nbsp;import org.icbt.hasitha.megacity.entity.Trip;
+&nbsp;import org.icbt.hasitha.megacity.repository.BookingRepo;
+&nbsp;import org.icbt.hasitha.megacity.service.interfaces.IBookingService;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.UUID;
+&nbsp;
+<b class="fc">&nbsp;public class BookingService implements IBookingService {</b>
+<b class="fc">&nbsp;    private final Logger LOGGER = LoggerFactory.getLogger(BookingService.class);</b>
+<b class="fc">&nbsp;    private BookingRepo bookingRepo =new BookingRepo();</b>
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;TripDetailsDTO&gt; getAllBookings(String userId) {
+<b class="pc">&nbsp;        LOGGER.info(&quot;Fetching all bookings for user: {}&quot;, userId != null ? userId : &quot;ALL&quot;);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            List&lt;Trip&gt; trips = bookingRepo.getTrips(userId);</b>
+<b class="fc">&nbsp;            return trips.stream().map(</b>
+<b class="fc">&nbsp;                    trip -&gt; new TripDetailsDTO(</b>
+<b class="fc">&nbsp;                            trip.getTripId(),</b>
+<b class="fc">&nbsp;                            trip.getVehicleId(),</b>
+<b class="fc">&nbsp;                            trip.getCustomerId(),</b>
+<b class="fc">&nbsp;                            trip.getDate(),</b>
+<b class="fc">&nbsp;                            trip.getDestination(),</b>
+<b class="fc">&nbsp;                            trip.getStartTime(),</b>
+<b class="fc">&nbsp;                            String.valueOf(trip.getFare()),</b>
+<b class="fc">&nbsp;                            trip.getDistance(),</b>
+<b class="fc">&nbsp;                            trip.getPassengerCount(),</b>
+<b class="fc">&nbsp;                            trip.getStartLocation())).toList();</b>
+&nbsp;
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error fetching bookings: {}&quot;, e.getMessage());</b>
+<b class="nc">&nbsp;            return Collections.emptyList();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;    @Override
+&nbsp;    public ResultDTO&lt;Boolean&gt; updateBooking(TripDetailsDTO tripDetailsDTO) {
+<b class="nc">&nbsp;        LOGGER.info(&quot;Updating booking: {}&quot;, tripDetailsDTO);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            boolean flag = bookingRepo.updateBooking(tripDetailsDTO);</b>
+<b class="nc">&nbsp;            if (flag) {</b>
+<b class="nc">&nbsp;                return new ResultDTO&lt;&gt;(&quot;Booking updated successfully&quot;, HttpServletResponse.SC_OK, true);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return new ResultDTO&lt;&gt;(&quot;Booking not found or could not be updated&quot;, HttpServletResponse.SC_NOT_FOUND, false);</b>
+&nbsp;            }
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error updating booking: {}&quot;, e.getMessage());</b>
+<b class="nc">&nbsp;            return new ResultDTO&lt;&gt;(e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, false);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;    @Override
+&nbsp;    public ResultDTO&lt;Boolean&gt; deleteBooking(UUID bookingId) throws RuntimeException {
+<b class="fc">&nbsp;        LOGGER.info(&quot;Deleting booking with ID: {}&quot;, bookingId);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            boolean flag = bookingRepo.deleteBooking(bookingId);</b>
+<b class="fc">&nbsp;            LOGGER.info(String.valueOf(flag));</b>
+<b class="pc">&nbsp;            if (flag) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;Booking deleted successfully&quot;);</b>
+<b class="nc">&nbsp;                return new ResultDTO&lt;&gt;(&quot;Booking deleted successfully&quot;, HttpServletResponse.SC_OK, true);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                LOGGER.error(&quot;Booking not found or could not be deleted: {}&quot;, bookingId);</b>
+<b class="fc">&nbsp;                return new ResultDTO&lt;&gt;(&quot;Booking not found or could not be deleted&quot;, HttpServletResponse.SC_NOT_FOUND, false);</b>
+&nbsp;            }
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error deleting booking: {}&quot;, e.getMessage());</b>
+<b class="nc">&nbsp;            return new ResultDTO&lt;&gt;(e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, false);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResultDTO&lt;Boolean&gt; save(TripDetailsDTO tripDetailsDTO) {
+<b class="fc">&nbsp;        LOGGER.info(&quot;BookingService.saveBooking: {}&quot;, tripDetailsDTO);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            boolean flag = bookingRepo.saveBooking(tripDetailsDTO);</b>
+<b class="pc">&nbsp;            if (flag) {</b>
+<b class="fc">&nbsp;                String subject = &quot;Booking Confirmation&quot;;</b>
+<b class="fc">&nbsp;                String message = &quot;Dear Customer,\n\nYour booking has been successfully placed!\n&quot; +</b>
+<b class="fc">&nbsp;                        &quot;Trip ID: &quot; + tripDetailsDTO.getTripId() + &quot;\n&quot; +</b>
+<b class="fc">&nbsp;                        &quot;Vehicle Type: &quot; + tripDetailsDTO.getVehicleType() + &quot;\n&quot; +</b>
+<b class="fc">&nbsp;                        &quot;Destination: &quot; + tripDetailsDTO.getDestination() + &quot;\n&quot; +</b>
+<b class="fc">&nbsp;                        &quot;Start Time: &quot; + tripDetailsDTO.getStartTime() + &quot;\n\n&quot; +</b>
+&nbsp;                        &quot;Thank you for choosing our service.&quot;;
+&nbsp;
+<b class="fc">&nbsp;                EmailService.sendBookingConfirmation(tripDetailsDTO.getCustomerEmail(), subject, message);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return new ResultDTO&lt;Boolean&gt;(&quot;Booking saved successfully&quot;, HttpServletResponse.SC_CREATED, flag);</b>
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error saving booking: {}&quot;, e.getMessage());</b>
+<b class="nc">&nbsp;            return new ResultDTO&lt;Boolean&gt;(e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, false);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-03-14 16:34</div>
+</div>
+</body>
+</html>
